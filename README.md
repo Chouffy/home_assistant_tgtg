@@ -13,12 +13,12 @@ This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.
     - platform: tgtg
       username: 'Your TGTG mail'
       password: 'Your TGTG password'
+      scan_interval: 900
       item:
         # item_id 1
         - 1234
         # item_id 2
         - 5678
-      scan_interval: 900
     ```
 
     * I suggest `scan_interval: 900` to refresh the stock every 15 minutes
@@ -35,4 +35,11 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 
 ## Features
 
-* Fetch each item stock
+Actual:
+
+* Fetch each item stock defined
+
+Maybe one day:
+
+* Retrieve all favorites instead of a manual list of item_id
+  * But this would mean using your "true" TGTG account which could be blocked due to non authorized API access ...
