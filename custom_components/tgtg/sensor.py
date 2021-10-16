@@ -75,6 +75,11 @@ class TGTGSensor(SensorEntity):
         return "mdi:storefront-outline"
 
     @property
+    def unit_of_measurement(self):
+        """Return the unit of measurement."""
+        return "bag(s)"
+
+    @property
     def native_value(self) -> str:
         """Return the state of the sensor."""
         return self.item_qty
