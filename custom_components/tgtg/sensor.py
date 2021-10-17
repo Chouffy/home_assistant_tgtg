@@ -77,8 +77,8 @@ class TGTGSensor(SensorEntity):
     @property
     def unit_of_measurement(self):
         """Return the unit of measurement."""
-        return "bag(s)"
-
+        return "pcs"
+        
     @property
     def native_value(self) -> str:
         """Return the state of the sensor."""
