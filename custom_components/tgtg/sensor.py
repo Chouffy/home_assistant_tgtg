@@ -62,12 +62,12 @@ class TGTGSensor(SensorEntity):
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
-        return self.store_name
+        return f"TGTG {self.store_name}"
 
     @property
     def unique_id(self) -> str:
         """Return a unique ID."""
-        return f"tgtg_item{self.item_id}"
+        return f"tgtg_{self.item_id}"
 
     @property
     def icon(self):
