@@ -41,5 +41,5 @@ Actual:
 
 Maybe one day:
 
-* Retrieve all favorites instead of a manual list of item_id
-  * But this would mean using your "true" TGTG account which could be blocked due to non authorized API access ...
+* Retrieve all favorites instead of a manual list of item_id, but this would mean using your "true" TGTG account ...
+* Parse additional availables informations from the `tgtg` API to Home-Assistant Attributes
