@@ -30,7 +30,7 @@ This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.
 
     * If your account doesn't have a password, try to reset your password from the app.
     * I suggest `scan_interval: 900` to refresh the stock every 15 minutes
-    * To avoid email, specify `access_token`, `refresh_token` and `user_id`. They can be retrieved using [this example](https://github.com/ahivert/tgtg-python#retrieve-tokens-to-avoid-login-email)
+    * To avoid email, specify `access_token`, `refresh_token` and `user_id`. They can be retrieved using [this script](./tgtg_get_tokens.py)!
 
 1. Restart the Home Assistant server
 
