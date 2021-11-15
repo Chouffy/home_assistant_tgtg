@@ -9,37 +9,46 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 
 1. Search for *TooGoodToGo* in the Integration tab of HACS
 1. Click *Install*
-1. Add the following in your `/config/configuration.yaml`:
-
-    ```yaml
-    sensor:
-    - platform: tgtg
-      username: 'Your TGTG mail'
-      password: 'Your TGTG password'
-      scan_interval: 900
-      item:
-        # item_id 1
-        - 1234
-        # item_id 2
-        - 5678
-
-      # Optional, for token-based authentication
-      access_token: "abc123"
-      refresh_token: "abc123"
-      user_id: "123"
-    ```
-
-    * If your account doesn't have a password, try to reset your password from the app.
-    * I suggest `scan_interval: 900` to refresh the stock every 15 minutes
-    * To avoid email, specify `access_token`, `refresh_token` and `user_id`. They can be retrieved using [this script](./tgtg_get_tokens.py)!
-
+1. Install required packages:
+  * [Python 3.8](https://www.python.org/downloads/)
+  * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg`
+1. Run [this script](./tgtg_get_tokens.py)
+  * If your account doesn't have a password, try to reset your password from the app.
+1. Paste the result in your `/config/configuration.yaml`.
 1. Restart the Home Assistant server
 
-### How to get the item_id
+### Configuration option
+
+```yaml
+sensor:
+- platform: tgtg
+  username: 'Your TGTG mail'
+  password: 'Your TGTG password'
+
+  # Refresh the stock every 15 minutes
+  scan_interval: 900
+
+  # Optional, use defined items ID instead to get your favorites
+  item:
+    # item_id 1
+    - 1234
+    # item_id 2
+    - 5678
+
+  # Optional, for token-based authentication and to avoid emails at each Home Assistant restart
+  access_token: "abc123"
+  refresh_token: "abc123"
+  user_id: "123"
+```
+
+* If your account doesn't have a password, try to reset your password from the app.
+* To avoid email, specify `access_token`, `refresh_token` and `user_id`. They can be retrieved using [this script](./tgtg_get_tokens.py)!
+
+### How to get item_id
 
 Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 
-1. Set up email and password
+1. Set up email/password
 1. Run it
 1. Copy the full output in the `configuration.yaml` for the `item` section
 
@@ -49,8 +58,8 @@ Actual:
 
 * Fetch each item stock defined
 * Authenticate using email/password or tokens
+* Retrieve all favorites instead of a manual list of item_id if no item: are defined
 
 Maybe one day:
 
-* Retrieve all favorites instead of a manual list of item_id, but this would mean using your "true" TGTG account ...
 * Parse additional available information from the `tgtg` API to Home-Assistant Attributes
