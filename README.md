@@ -1,6 +1,7 @@
 # TooGoodToGo items stock as a sensor in Home Assistant
 
 This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.com/) item using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.
+Sensor data can be used afterward to generate notifications, history graphs, ...
 
 ## Usage
 
