@@ -46,8 +46,9 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 Actual:
 
 * Fetch each item stock defined
+* Authenticate using email/password or tokens
 
 Maybe one day:
 
 * Retrieve all favorites instead of a manual list of item_id, but this would mean using your "true" TGTG account ...
-* Parse additional availables informations from the `tgtg` API to Home-Assistant Attributes
+* Parse additional available information from the `tgtg` API to Home-Assistant Attributes
