@@ -1,6 +1,6 @@
 # TooGoodToGo items stock as a sensor in Home Assistant
 
-This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.com/) item using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.
+This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.com/) item using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.  
 Sensor data can be used afterward to generate notifications, history graphs, ...
 
 ## Usage
@@ -16,6 +16,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
     * If your account doesn't have a password, try to reset your password from the app.
 1. Paste the result in your `/config/configuration.yaml`.
 1. Restart the Home Assistant server
+    * ⚠ Each time you add/remove a favorite in the TGTG app, **restart your Home Assistant**. Favorites are only updated at boot!
 
 ### Configuration option
 
