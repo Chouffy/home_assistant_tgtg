@@ -10,10 +10,10 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 1. Search for *TooGoodToGo* in the Integration tab of HACS
 1. Click *Install*
 1. Install required packages:
-  * [Python 3.8](https://www.python.org/downloads/)
-  * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg`
+    * [Python 3.8](https://www.python.org/downloads/)
+    * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg`
 1. Run [this script](./tgtg_get_tokens.py)
-  * If your account doesn't have a password, try to reset your password from the app.
+    * If your account doesn't have a password, try to reset your password from the app.
 1. Paste the result in your `/config/configuration.yaml`.
 1. Restart the Home Assistant server
 
