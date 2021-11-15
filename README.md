@@ -9,7 +9,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 
 1. Search for *TooGoodToGo* in the Integration tab of HACS
 1. Click *Install*
-1. Install required packages:
+1. Install required packages on your local PC:
     * [Python 3.8](https://www.python.org/downloads/)
     * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg`
 1. Run [this script](./tgtg_get_tokens.py)
