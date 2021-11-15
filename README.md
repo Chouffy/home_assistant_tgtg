@@ -1,8 +1,5 @@
 # TooGoodToGo items stock as a sensor in Home Assistant
 
-| :exclamation:  There's currently an [on-going issue](https://github.com/Chouffy/home_assistant_tgtg/issues/1) about authentication. Right now, this module won't work.  |
-|-----------------------------------------|
-
 This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.com/) item using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.
 
 ## Usage
