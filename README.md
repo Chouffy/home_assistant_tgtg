@@ -11,7 +11,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 1. Click *Install*
 1. Install required packages on your local PC:
     * [Python 3.8](https://www.python.org/downloads/)
-    * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg`
+    * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg>=0.7.0`
 1. Run [this script](./tgtg_get_tokens.py)
     * If your account doesn't have a password, try to reset your password from the app.
 1. Paste the result in your `/config/configuration.yaml`.
