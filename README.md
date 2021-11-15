@@ -4,7 +4,9 @@ This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.
 
 ## Usage
 
-1. Add this repository `https://github.com/Chouffy/home_assistant_tgtg` as a custom repository with *integration* type
+### Installation via [HACS](https://hacs.xyz/)
+
+1. Search for *TooGoodToGo* in the Integration tab of HACS
 1. Click *Install*
 1. Add the following in your `/config/configuration.yaml`:
 

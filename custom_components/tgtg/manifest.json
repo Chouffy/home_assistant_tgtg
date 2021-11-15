@@ -1,7 +1,7 @@
 {
   "domain": "tgtg",
   "name": "TooGooToGo",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "documentation": "https://github.com/Chouffy/home_assistant_tgtg",
   "issue_tracker": "https://github.com/Chouffy/home_assistant_tgtg/issues",
   "codeowners": ["@chouffy"],
