@@ -14,6 +14,9 @@ from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "tgtg"
 CONF_ITEM = "item"
+CONF_ACCESS_TOKEN = "access_token"
+CONF_REFRESH_TOKEN = "refresh_token"
+CONF_USER_ID = "user_id"
 _LOGGER = logging.getLogger(DOMAIN)
 
 
@@ -22,6 +25,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Required(CONF_USERNAME): cv.string,
         vol.Required(CONF_PASSWORD): cv.string,
         vol.Required(CONF_ITEM): cv.ensure_list,
+        vol.Optional(CONF_ACCESS_TOKEN, default=""): cv.string,
+        vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
+        vol.Optional(CONF_USER_ID, default=""): cv.string,
     }
 )
 
@@ -38,9 +44,16 @@ def setup_platform(
 
     username = config[CONF_USERNAME]
     password = config[CONF_PASSWORD]
+    access_token = config[CONF_ACCESS_TOKEN]
+    refresh_token = config[CONF_REFRESH_TOKEN]
+    user_id = config[CONF_USER_ID]
 
     global tgtg_client
-    tgtg_client = TgtgClient(email=username, password=password)
+
+    if access_token != "" and refresh_token != "" and user_id != "":
+        tgtg_client = TgtgClient(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
+    else:
+        tgtg_client = TgtgClient(email=username, password=password)
 
     for each_item_id in config[CONF_ITEM]:
         add_entities([TGTGSensor(each_item_id)])
