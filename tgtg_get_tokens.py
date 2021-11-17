@@ -4,7 +4,7 @@
 from tgtg import TgtgClient
 
 # ⚠ Change your email/password combo here.
-# If you don't have a password, reset it from the app.
+# If you don't have a password, try to reset it here: https://store.toogoodtogo.com/reset-password
 email = "Your TGTG mail"
 password = "Your TGTG password"
 
