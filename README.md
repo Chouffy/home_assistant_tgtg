@@ -13,7 +13,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
     * [Python 3.8](https://www.python.org/downloads/)
     * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg>=0.7.0`
 1. Run [this script](./tgtg_get_tokens.py)
-    * If your account doesn't have a password, try to reset your password from the app.
+    * If your account doesn't have a password, try to reset your password using [this link](https://store.toogoodtogo.com/reset-password)
 1. Paste the result in your `/config/configuration.yaml`.
 1. Restart the Home Assistant server
     * ⚠ Each time you add/remove a favorite in the TGTG app, **restart your Home Assistant**. Favorites are only updated at boot!
