@@ -1,5 +1,8 @@
 # TooGoodToGo items stock as a sensor in Home Assistant
 
+| :exclamation:  There's currently an [on-going issue](https://github.com/Chouffy/home_assistant_tgtg/issues/11) about authentication using username and password. Right now, this module won't work if you don't have the tokens.  |
+|-----------------------------------------|
+
 This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.com/) item using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.  
 Sensor data can be used afterward to generate notifications, history graphs, .... Share your best examples in the [Discussion tab](https://github.com/Chouffy/home_assistant_tgtg/discussions)!
 
@@ -13,7 +16,8 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
     * [Python 3.8](https://www.python.org/downloads/)
     * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg>=0.7.0`
 1. Run [this script](./tgtg_get_tokens.py)
-    * If your account doesn't have a password, try to reset your password using [this link](https://store.toogoodtogo.com/reset-password)
+    * ~~If your account doesn't have a password, try to reset your password using [this link](https://store.toogoodtogo.com/reset-password) ~~
+    * The above doesn't work due to [this issue](https://github.com/Chouffy/home_assistant_tgtg/issues/11) - tokens needs to be retrieved somewhere else ...
 1. Paste the result in your `/config/configuration.yaml`.
 1. Restart the Home Assistant server
     * ⚠ Each time you add/remove a favorite in the TGTG app, **restart your Home Assistant**. Favorites are only updated at boot!
