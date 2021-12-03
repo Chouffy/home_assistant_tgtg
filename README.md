@@ -11,7 +11,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 1. Click *Install*
 1. Install required packages on your local PC:
     * [Python >=3.8](https://www.python.org/downloads/)
-    * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg>=0.7.0`
+    * [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg>=0.10.0` or `pip install --upgrade tgtg` if you already have it.
 1. Run the [tgtg_get_tokens](./tgtg_get_tokens.py) script on your local PC:
 1. Paste the result in your `/config/configuration.yaml`.
 1. Restart the Home Assistant server
