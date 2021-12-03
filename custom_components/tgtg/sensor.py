@@ -22,12 +22,11 @@ _LOGGER = logging.getLogger(DOMAIN)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Required(CONF_USERNAME): cv.string,
-        vol.Required(CONF_PASSWORD): cv.string,
+        vol.Optional(CONF_USERNAME): cv.string,
         vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
-        vol.Optional(CONF_ACCESS_TOKEN, default=""): cv.string,
-        vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
-        vol.Optional(CONF_USER_ID, default=""): cv.string,
+        vol.Required(CONF_ACCESS_TOKEN, default=""): cv.string,
+        vol.Required(CONF_REFRESH_TOKEN, default=""): cv.string,
+        vol.Required(CONF_USER_ID, default=""): cv.string,
     }
 )
 
@@ -43,7 +42,6 @@ def setup_platform(
     """Set up the sensor platform."""
 
     username = config[CONF_USERNAME]
-    password = config[CONF_PASSWORD]
     item = config[CONF_ITEM]
     access_token = config[CONF_ACCESS_TOKEN]
     refresh_token = config[CONF_REFRESH_TOKEN]
@@ -51,11 +49,8 @@ def setup_platform(
 
     global tgtg_client
 
-    # If all 3 tokens are defined, login with them - otherwise use email/password
-    if access_token != "" and refresh_token != "" and user_id != "":
-        tgtg_client = TgtgClient(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
-    else:
-        tgtg_client = TgtgClient(email=username, password=password)
+    # Log in with tokens
+    tgtg_client = TgtgClient(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
 
     # If item: isn't defined, use favorites - otherwise use defined items
     if item != [""]:

@@ -1,29 +1,27 @@
-# Before running this, make sure that python, pip and tgtg are installed!
-# In a command line: pip install tgtg>=0.7.0
+# Before running this, make sure that python3, pip and tgtg are installed!
+# In a command line: pip install tgtg>=0.10.0
 
 from tgtg import TgtgClient
 
-# ⚠ Change your email/password combo here.
-# If you don't have a password, try to reset it here: https://store.toogoodtogo.com/reset-password
-email = "Your TGTG mail"
-password = "Your TGTG password"
+# Input your email here
+email = input("Type your email linked to your TGTG account: ")
 
 # Set up a tgtg client
-client = TgtgClient(email=email, password=password)
+tgtgClient = TgtgClient(email=email)
+tgtgClient.get_credentials()
 
-# Necessary to actually get the tokens
-client.get_items()
+# You should receive an email from TGTG: click the link inside to continue.
 
 # Print the result!
-print("Copy paste this in your configuration.yaml file:")
+print()
+print("Copy-paste this in your configuration.yaml file:")
 print("")
 print("sensor:")
 print("  - platform: tgtg")
 print("    username: '" + email + "'")
-print("    password: '" + password + "'")
-print("    access_token: '" + client.access_token + "'")
-print("    refresh_token: '" + client.refresh_token + "'")
-print("    user_id: '" + client.user_id + "'")
+print("    access_token: '" + tgtgClient.access_token + "'")
+print("    refresh_token: '" + tgtgClient.refresh_token + "'")
+print("    user_id: '" + tgtgClient.user_id + "'")
 print("    scan_interval: 900")
 print("")
-input("Press enter to quit ...")
+input("Press enter to continue ...")
