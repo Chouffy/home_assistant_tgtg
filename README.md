@@ -43,7 +43,7 @@ sensor:
 
 ```
 
-*  `access_token`, `refresh_token` and `user_id` can be retrieved using the [tgtg_get_tokens](./tgtg_get_tokens.py) script!
+`access_token`, `refresh_token` and `user_id` can be retrieved using the [tgtg_get_tokens](./tgtg_get_tokens.py) script!
 
 ### How to get item_id
 
@@ -55,12 +55,6 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 
 ## Features
 
-Actual:
-
 * Fetch each item stock defined
 * Authenticate using tokens
 * Retrieve all favorites instead of a manual list of item_id if no `item:` are defined
-
-Maybe one day:
-
-* Parse additional available information from the `tgtg` API to Home-Assistant Attributes
