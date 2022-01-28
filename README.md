@@ -59,7 +59,7 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 * Authenticate using tokens
 * Retrieve all favorites instead of a manual list of item_id if no `item:` are defined
 
-### Q&A
+## Q&A
 
 * I have a sensor that shows now as unavailable when there's no stock
     * Try add it manually using Item ID - See [this issue](https://github.com/Chouffy/home_assistant_tgtg/issues/18)
