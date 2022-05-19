@@ -1,10 +1,10 @@
 {
   "domain": "tgtg",
   "name": "TooGooToGo",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "documentation": "https://github.com/Chouffy/home_assistant_tgtg",
   "issue_tracker": "https://github.com/Chouffy/home_assistant_tgtg/issues",
   "codeowners": ["@chouffy"],
-  "requirements": ["tgtg>=0.11.2"],
+  "requirements": ["tgtg>=0.11.3"],
   "iot_class": "cloud_polling"
 }
