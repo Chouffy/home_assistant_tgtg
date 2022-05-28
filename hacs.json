@@ -1,6 +1,4 @@
 {
   "name": "TooGoodToGo",
-  "render_readme": true,
-  "domains": "sensor",
-  "iot_class": "Cloud Polling"
-  }
+  "render_readme": true
+}
