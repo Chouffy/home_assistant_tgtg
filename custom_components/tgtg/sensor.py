@@ -17,6 +17,7 @@ CONF_ITEM = "item"
 CONF_ACCESS_TOKEN = "access_token"
 CONF_REFRESH_TOKEN = "refresh_token"
 CONF_USER_ID = "user_id"
+CONF_USER_AGENT = "user_agent"
 ATTR_ITEM_ID = "Item ID"
 ATTR_ITEM_ID_URL = "Item URL"
 ATTR_PRICE = "TGTG Price"
@@ -34,6 +35,10 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_ACCESS_TOKEN, default=""): cv.string,
         vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
         vol.Optional(CONF_USER_ID, default=""): cv.string,
+        vol.Optional(
+            CONF_USER_AGENT,
+            default="TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)",
+        ): cv.string,
     }
 )
 
@@ -53,12 +58,16 @@ def setup_platform(
     access_token = config[CONF_ACCESS_TOKEN]
     refresh_token = config[CONF_REFRESH_TOKEN]
     user_id = config[CONF_USER_ID]
+    user_agent = config[CONF_USER_AGENT]
 
     global tgtg_client
 
     # Log in with tokens
     tgtg_client = TgtgClient(
-        access_token=access_token, refresh_token=refresh_token, user_id=user_id
+        access_token=access_token,
+        refresh_token=refresh_token,
+        user_id=user_id,
+        user_agent=user_agent,
     )
 
     # If item: isn't defined, use favorites - otherwise use defined items
