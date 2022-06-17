@@ -30,7 +30,7 @@ _LOGGER = logging.getLogger(DOMAIN)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Required(CONF_USERNAME): cv.string,
+        vol.Optional(CONF_USERNAME): cv.string,
         vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
         vol.Optional(CONF_ACCESS_TOKEN, default=""): cv.string,
         vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
