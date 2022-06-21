@@ -35,10 +35,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_ACCESS_TOKEN, default=""): cv.string,
         vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
         vol.Optional(CONF_USER_ID, default=""): cv.string,
-        vol.Optional(
-            CONF_USER_AGENT,
-            default="TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)",
-        ): cv.string,
+        vol.Optional(CONF_USER_AGENT, default=""): cv.string,
     }
 )
 
