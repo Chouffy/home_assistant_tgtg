@@ -28,9 +28,6 @@ sensor:
   refresh_token: "abc123"
   user_id: "123"
 
-  # Optional: user agent, based on the latest TGTG app version - a default one is also coded
-  #user_agent: "TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)"
-
   # Optional: email so you know which account is used
   username: 'Your TGTG mail'
 
@@ -43,6 +40,9 @@ sensor:
     - 1234
     # item_id 2
     - 5678
+
+  # Optional: user agent - by default, the latest one is retrieved from the Google Play store
+  #user_agent: "TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)"
 
 ```
 
