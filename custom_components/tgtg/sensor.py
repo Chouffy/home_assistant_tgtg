@@ -18,6 +18,7 @@ CONF_ACCESS_TOKEN = "access_token"
 CONF_REFRESH_TOKEN = "refresh_token"
 CONF_USER_ID = "user_id"
 CONF_USER_AGENT = "user_agent"
+CONF_PAGE_SIZE = "page_size"
 ATTR_ITEM_ID = "Item ID"
 ATTR_ITEM_ID_URL = "Item URL"
 ATTR_PRICE = "TGTG Price"
@@ -36,6 +37,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
         vol.Optional(CONF_USER_ID, default=""): cv.string,
         vol.Optional(CONF_USER_AGENT, default=""): cv.string,
+        vol.Optional(CONF_PAGE_SIZE, default="20"): cv.string,
     }
 )
 
@@ -56,6 +58,7 @@ def setup_platform(
     refresh_token = config[CONF_REFRESH_TOKEN]
     user_id = config[CONF_USER_ID]
     user_agent = config[CONF_USER_AGENT]
+    page_size = config[CONF_PAGE_SIZE]
 
     global tgtg_client
 
@@ -72,7 +75,7 @@ def setup_platform(
         for each_item_id in item:
             add_entities([TGTGSensor(each_item_id)])
     else:
-        tgtgReply = tgtg_client.get_items()
+        tgtgReply = tgtg_client.get_items(page_size=page_size)
         for item in tgtgReply:
             add_entities([TGTGSensor(item["item"]["item_id"])])
 
