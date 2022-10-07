@@ -34,12 +34,15 @@ sensor:
   # Optional: Refresh the stock every 15 minutes
   scan_interval: 900
 
-  # Optional, use defined items ID instead to get your favorites
+  # Optional: use defined items ID instead to get your favorites
   item:
     # item_id 1
     - 1234
     # item_id 2
     - 5678
+
+  # Optional: Amount of favourites to retrieve (default: 20)
+  page_size: 20
 
   # Optional: user agent - by default, the latest one is retrieved from the Google Play store
   #user_agent: "TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)"
@@ -73,3 +76,5 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
     * Try add it manually using Item ID - See [this issue](https://github.com/Chouffy/home_assistant_tgtg/issues/18)
 * The `tgtg` integration won't start, all my sensors are unavailable and I have a list of manually defined items ID
     * Double-check if all items ID defined manually are correct. The integration [don't support unknown or incorrect item ID - see issue](https://github.com/Chouffy/home_assistant_tgtg/issues/22).
+* I have a large favourite list and not all of the items are appearing in home assistant
+    * Increase the page_size in your configuration.yaml
