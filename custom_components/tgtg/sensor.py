@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import voluptuous as vol
 
-from tgtg import TgtgClient
+from tgtg import TgtgClient, BASE_URL as TGTG_BASE_URL
 
 from homeassistant.components.sensor import SensorEntity, PLATFORM_SCHEMA
 from homeassistant.core import HomeAssistant
@@ -18,6 +18,7 @@ CONF_ACCESS_TOKEN = "access_token"
 CONF_REFRESH_TOKEN = "refresh_token"
 CONF_USER_ID = "user_id"
 CONF_USER_AGENT = "user_agent"
+CONF_BASE_URL = "base_url"
 ATTR_ITEM_ID = "Item ID"
 ATTR_ITEM_ID_URL = "Item URL"
 ATTR_PRICE = "TGTG Price"
@@ -36,6 +37,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
         vol.Optional(CONF_USER_ID, default=""): cv.string,
         vol.Optional(CONF_USER_AGENT, default=""): cv.string,
+        vol.Optional(CONF_BASE_URL, default=TGTG_BASE_URL): cv.string,
     }
 )
 
@@ -56,6 +58,7 @@ def setup_platform(
     refresh_token = config[CONF_REFRESH_TOKEN]
     user_id = config[CONF_USER_ID]
     user_agent = config[CONF_USER_AGENT]
+    base_url = config[CONF_BASE_URL]
 
     global tgtg_client
 
@@ -65,6 +68,7 @@ def setup_platform(
         refresh_token=refresh_token,
         user_id=user_id,
         user_agent=user_agent,
+        url=base_url,
     )
 
     # If item: isn't defined, use favorites - otherwise use defined items
