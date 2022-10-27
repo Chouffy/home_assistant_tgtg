@@ -43,7 +43,9 @@ sensor:
 
   # Optional: user agent - by default, the latest one is retrieved from the Google Play store
   #user_agent: "TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)"
-
+  
+  # Optional: base url on which the api calls are made - by default, the value specified in tgtg-python
+  # base_url: "https://apptoogoodtogo.com/api/"
 ```
 
 `access_token`, `refresh_token` and `user_id` can be retrieved using the [tgtg_get_tokens](./tgtg_get_tokens.py) script!
