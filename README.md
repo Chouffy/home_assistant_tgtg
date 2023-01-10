@@ -69,6 +69,8 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 
 ## Q&A
 
+* It was working before, but now all TooGoodToGo sensors are "not available"
+   * Try to update your tokens using [the script](https://github.com/Chouffy/home_assistant_tgtg/blob/main/tgtg_get_tokens.py) and restart Home Assistant
 * I have a sensor that shows now as unavailable when there's no stock
     * Try add it manually using Item ID - See [this issue](https://github.com/Chouffy/home_assistant_tgtg/issues/18)
 * The `tgtg` integration won't start, all my sensors are unavailable and I have a list of manually defined items ID
