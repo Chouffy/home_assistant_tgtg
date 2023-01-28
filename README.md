@@ -1,10 +1,5 @@
 # TooGoodToGo items stock as a sensor in Home Assistant
 
-⚠ There's an [on-going issue](https://github.com/Chouffy/home_assistant_tgtg/issues/37) that prevents retrieving the `tgtg` data.
-This module will probably won't work for you right now, unlessit is resolved on the upstream module - see [this issue](https://github.com/ahivert/tgtg-python/issues/205).
-
----
-
 This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.com/) item using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.  
 Sensor data can be used afterward to generate notifications, history graphs, ... share your best examples in the [Discussion tab](https://github.com/Chouffy/home_assistant_tgtg/discussions)!
 
@@ -29,7 +24,7 @@ sensor:
 - platform: tgtg
 
   # Optional: email so you know which account is used
-  username: 'Your TGTG mail'
+  email: 'Your TGTG mail'
 
   # Mandatory: tokens for authentication - see the tgtg_get_tokens.py script
   access_token: "abc123"
