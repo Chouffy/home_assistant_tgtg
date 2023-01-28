@@ -30,10 +30,10 @@ _LOGGER = logging.getLogger(DOMAIN)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.required(CONF_ACCESS_TOKEN): cv.string,
-        vol.required(CONF_REFRESH_TOKEN): cv.string,
-        vol.required(CONF_USER_ID): cv.string,
-        vol.required(CONF_COOKIE): cv.string,
+        vol.Required(CONF_ACCESS_TOKEN): cv.string,
+        vol.Required(CONF_REFRESH_TOKEN): cv.string,
+        vol.Required(CONF_USER_ID): cv.string,
+        vol.Required(CONF_COOKIE): cv.string,
         vol.Optional(CONF_EMAIL): cv.email,
         vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
         vol.Optional(CONF_USER_AGENT, default=""): cv.string,
