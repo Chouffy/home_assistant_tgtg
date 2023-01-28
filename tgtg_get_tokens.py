@@ -8,7 +8,7 @@ email = input("Type your email linked to your TGTG account: ")
 
 # Set up a tgtg client
 tgtgClient = TgtgClient(email=email)
-tgtgCredentials = tgtgClient.get_credentials()
+tgtgClient.get_credentials()
 
 # You should receive an email from TGTG: click the link inside to continue.
 
@@ -19,10 +19,10 @@ print("")
 print("sensor:")
 print("  - platform: tgtg")
 print("    email: '" + email + "'")
-print("    access_token: '" + tgtgCredentials.access_token + "'")
-print("    refresh_token: '" + tgtgCredentials.refresh_token + "'")
-print("    user_id: '" + tgtgCredentials.user_id + "'")
-print("    cookie: '" + tgtgCredentials.cookie + "'")
+print("    access_token: '" + tgtgClient.access_token + "'")
+print("    refresh_token: '" + tgtgClient.refresh_token + "'")
+print("    user_id: '" + tgtgClient.user_id + "'")
+print("    cookie: '" + tgtgClient.cookie + "'")
 print("    scan_interval: 900")
 print("")
 input("Press enter to continue ...")
