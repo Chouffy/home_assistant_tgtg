@@ -29,8 +29,8 @@ sensor:
   # Mandatory: tokens for authentication - see the tgtg_get_tokens.py script
   access_token: "abc123"
   refresh_token: "abc123"
-  user_id: "123"
-  cookie: ""
+  user_id: "123456"
+  cookie: "datadome=..."
 
   # Optional: Refresh the stock every 15 minutes
   scan_interval: 900
