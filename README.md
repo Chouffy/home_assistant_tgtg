@@ -23,13 +23,14 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 sensor:
 - platform: tgtg
 
+  # Optional: email so you know which account is used
+  username: 'Your TGTG mail'
+
   # Mandatory: tokens for authentication - see the tgtg_get_tokens.py script
   access_token: "abc123"
   refresh_token: "abc123"
   user_id: "123"
-
-  # Optional: email so you know which account is used
-  username: 'Your TGTG mail'
+  cookie: ""
 
   # Optional: Refresh the stock every 15 minutes
   scan_interval: 900
@@ -46,7 +47,7 @@ sensor:
 
 ```
 
-`access_token`, `refresh_token` and `user_id` can be retrieved using the [tgtg_get_tokens](./tgtg_get_tokens.py) script!
+`access_token`, `refresh_token`, `user_id` and `cookie` can be retrieved using the [tgtg_get_tokens](./tgtg_get_tokens.py) script!
 
 ### How to get item_id
 
