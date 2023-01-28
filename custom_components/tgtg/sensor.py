@@ -34,9 +34,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Required(CONF_REFRESH_TOKEN): cv.string,
         vol.Required(CONF_USER_ID): cv.string,
         vol.Required(CONF_COOKIE): cv.string,
-        vol.Optional(CONF_EMAIL): cv.email,
+        vol.Optional(CONF_EMAIL): vol.Email(),
         vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
-        vol.Optional(CONF_USER_AGENT, default=""): cv.string,
+        vol.Optional(CONF_USER_AGENT, default=""): cv.strin,
     }
 )
 
