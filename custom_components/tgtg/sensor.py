@@ -16,6 +16,7 @@ DOMAIN = "tgtg"
 CONF_ITEM = "item"
 CONF_ACCESS_TOKEN = "access_token"
 CONF_REFRESH_TOKEN = "refresh_token"
+CONF_COOKIE = "cookie"
 CONF_USER_ID = "user_id"
 CONF_USER_AGENT = "user_agent"
 ATTR_ITEM_ID = "Item ID"
@@ -35,6 +36,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_ACCESS_TOKEN, default=""): cv.string,
         vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
         vol.Optional(CONF_USER_ID, default=""): cv.string,
+        vol.Optional(CONF_COOKIE, default=""): cv.string,
         vol.Optional(CONF_USER_AGENT, default=""): cv.string,
     }
 )
@@ -55,6 +57,7 @@ def setup_platform(
     access_token = config[CONF_ACCESS_TOKEN]
     refresh_token = config[CONF_REFRESH_TOKEN]
     user_id = config[CONF_USER_ID]
+    cookie = config[CONF_COOKIE]
     user_agent = config[CONF_USER_AGENT]
 
     global tgtg_client
@@ -64,6 +67,7 @@ def setup_platform(
         access_token=access_token,
         refresh_token=refresh_token,
         user_id=user_id,
+        cookie=cookie,
         user_agent=user_agent,
     )
 
