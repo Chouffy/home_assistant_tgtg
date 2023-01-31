@@ -1,5 +1,5 @@
 # Before running this, make sure that python3, pip and tgtg are installed!
-# In a command line: pip install tgtg>=0.10.0
+# In a command line: pip install tgtg==0.14.0
 
 from tgtg import TgtgClient
 
@@ -18,10 +18,11 @@ print("Copy-paste this in your configuration.yaml file:")
 print("")
 print("sensor:")
 print("  - platform: tgtg")
-print("    username: '" + email + "'")
+print("    email: '" + email + "'")
 print("    access_token: '" + tgtgClient.access_token + "'")
 print("    refresh_token: '" + tgtgClient.refresh_token + "'")
 print("    user_id: '" + tgtgClient.user_id + "'")
+print("    cookie: '" + tgtgClient.cookie + "'")
 print("    scan_interval: 900")
 print("")
 input("Press enter to continue ...")
