@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # Before running this, make sure that python3, pip and tgtg are installed!
 # In a command line: pip install tgtg==0.14.0
 
