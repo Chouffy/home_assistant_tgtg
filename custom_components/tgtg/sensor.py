@@ -7,16 +7,16 @@ from tgtg import TgtgClient
 
 from homeassistant.components.sensor import SensorEntity, PLATFORM_SCHEMA
 from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
+from homeassistant.const import CONF_ACCESS_TOKEN, CONF_EMAIL
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "tgtg"
 CONF_ITEM = "item"
-CONF_ACCESS_TOKEN = "access_token"
 CONF_REFRESH_TOKEN = "refresh_token"
 CONF_USER_ID = "user_id"
+CONF_COOKIE = "cookie"
 CONF_USER_AGENT = "user_agent"
 ATTR_ITEM_ID = "Item ID"
 ATTR_ITEM_ID_URL = "Item URL"
@@ -30,11 +30,12 @@ _LOGGER = logging.getLogger(DOMAIN)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
-        vol.Optional(CONF_USERNAME): cv.string,
+        vol.Required(CONF_ACCESS_TOKEN): cv.string,
+        vol.Required(CONF_REFRESH_TOKEN): cv.string,
+        vol.Required(CONF_USER_ID): cv.string,
+        vol.Required(CONF_COOKIE): cv.string,
+        vol.Optional(CONF_EMAIL): vol.Email(),
         vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
-        vol.Optional(CONF_ACCESS_TOKEN, default=""): cv.string,
-        vol.Optional(CONF_REFRESH_TOKEN, default=""): cv.string,
-        vol.Optional(CONF_USER_ID, default=""): cv.string,
         vol.Optional(CONF_USER_AGENT, default=""): cv.string,
     }
 )
@@ -50,11 +51,12 @@ def setup_platform(
 ) -> None:
     """Set up the sensor platform."""
 
-    username = config[CONF_USERNAME]
+    email = config[CONF_EMAIL]
     item = config[CONF_ITEM]
     access_token = config[CONF_ACCESS_TOKEN]
     refresh_token = config[CONF_REFRESH_TOKEN]
     user_id = config[CONF_USER_ID]
+    cookie = config[CONF_COOKIE]
     user_agent = config[CONF_USER_AGENT]
 
     global tgtg_client
@@ -64,6 +66,7 @@ def setup_platform(
         access_token=access_token,
         refresh_token=refresh_token,
         user_id=user_id,
+        cookie=cookie,
         user_agent=user_agent,
     )
 
