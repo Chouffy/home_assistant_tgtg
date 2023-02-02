@@ -24,7 +24,7 @@ _This is work in progress._
 
 You only need Docker installed. There is no need to clone the repo because Docker can build from an external URL?
 
-`docker build docker build https://github.com/Chouffy/home_assistant_tgtg.git#main`
+`docker build docker build https://github.com/Chouffy/home_assistant_tgtg.git#main --tag "homeassistant_tgtg_tokens:latest"`
 
 `docker run --rm -it homeassistant_tgtg_tokens`
 
