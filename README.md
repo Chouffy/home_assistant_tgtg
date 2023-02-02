@@ -22,9 +22,9 @@ This is to be executed outside of Home Assistant, i.e. on your local machine.
 
 _This is work in progress._
 
-Run docker build and run the container interactively.
+You only need Docker installed. There is no need to clone the repo because Docker can build from an external URL?
 
-`docker build https://github.com/Chouffy/home_assistant_tgtg`
+`docker build docker build https://github.com/Chouffy/home_assistant_tgtg.git#main`
 
 `docker run --rm -it homeassistant_tgtg_tokens`
 
