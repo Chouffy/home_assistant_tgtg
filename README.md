@@ -40,19 +40,16 @@ You only need Docker installed. There is no need to clone the repo because Docke
 
 ```yaml
 sensor:
-- platform: tgtg
-
-  # Optional: email so you know which account is used
-  email: 'Your TGTG mail'
-
-  # Mandatory: tokens for authentication - see the tgtg_get_tokens.py script
-  access_token: "abc123"
-  refresh_token: "abc123"
-  user_id: "123456"
-  cookie: "datadome=..."
+  - platform: tgtg
 
     # Optional: email so you know which account is used
-    username: "Your TGTG mail"
+    email: "Your TGTG mail"
+
+    # Mandatory: tokens for authentication - see the tgtg_get_tokens.py script
+    access_token: "abc123"
+    refresh_token: "abc123"
+    user_id: "123456"
+    cookie: "datadome=..."
 
     # Optional: Refresh the stock every 15 minutes
     scan_interval: 900
