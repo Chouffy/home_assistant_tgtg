@@ -3,40 +3,57 @@
 This aim to show the stock of one or multiple [TooGoodToGo](https://toogoodtogo.com/) item using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.
 Sensor data can be used afterward to generate notifications, history graphs, ... share your best examples in the [Discussion tab](https://github.com/Chouffy/home_assistant_tgtg/discussions)!
 
-## Usage
+## Features
 
-### Get access tokens
+- Fetch each item stock defined
+- Authenticate using tokens
+- Retrieve all favorites instead of a manual list of item_id if no `item:` are defined
+- Retrieve additional information as attributes, if available:
+  - Item ID
+  - TooGoodToGo price and original value
+  - Pick-up start and end
+  - Sold-out date
+
+## Installation
+
+Two steps are required:
+
+1. Get access tokens, either manually or via Docker
+1. Install the integration
+
+### 1. Get access tokens
 
 First you'll need to get access tokens for this integration to work.
 
 This is to be executed outside of Home Assistant, i.e. on your local machine.
 
-#### Manually
+#### 1a. Manually
 
 1. Install required packages.
    - [Python >=3.8](https://www.python.org/downloads/)
    - [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg>=0.11.0` or `pip install --upgrade tgtg` if you already have it.
 1. Run the [tgtg_get_tokens](./tgtg_get_tokens.py) script to get access and refresh token. Save these for later.
 
-#### Docker
+#### 1b. Docker
 
 _This is work in progress._
 
 You only need Docker installed. There is no need to clone the repo because Docker can build from an external URL?
 
-`docker build docker build https://github.com/Chouffy/home_assistant_tgtg.git#main --tag "homeassistant_tgtg_tokens:latest"`
+```
+docker build docker build https://github.com/Chouffy/home_assistant_tgtg.git#main --tag "homeassistant_tgtg_tokens:latest"
+docker run --rm -it homeassistant_tgtg_tokens
+```
 
-`docker run --rm -it homeassistant_tgtg_tokens`
-
-### Installation via [HACS](https://hacs.xyz/)
+### 2. Installation via [HACS](https://hacs.xyz/)
 
 1. Search for _TooGoodToGo_ in the Integration tab of HACS
 1. Click _Install_
-1. Copy over the tokens in `/config/configuration.yaml`.
+1. Copy over the tokens in `/config/configuration.yaml` retrieved in 1.
 1. Restart the Home Assistant server
    - ⚠ Each time you add/remove a favorite in the TGTG app, **restart your Home Assistant**. Favorites are only updated at boot!
 
-### Configuration option
+## Configuration option
 
 ```yaml
 sensor:
@@ -74,17 +91,6 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 1. Set up email/password
 1. Run it
 1. Copy the full output in the `configuration.yaml` for the `item` section
-
-## Features
-
-- Fetch each item stock defined
-- Authenticate using tokens
-- Retrieve all favorites instead of a manual list of item_id if no `item:` are defined
-- Retrieve additional information as attributes, if available:
-  - Item ID
-  - TooGoodToGo price and original value
-  - Pick-up start and end
-  - Sold-out date
 
 ## Q&A
 
