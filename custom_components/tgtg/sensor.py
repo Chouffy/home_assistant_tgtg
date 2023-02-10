@@ -51,7 +51,7 @@ def setup_platform(
 ) -> None:
     """Set up the sensor platform."""
 
-    email = config[CONF_EMAIL]
+    email = config.get(CONF_EMAIL)
     item = config[CONF_ITEM]
     access_token = config[CONF_ACCESS_TOKEN]
     refresh_token = config[CONF_REFRESH_TOKEN]
