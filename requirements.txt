@@ -1,0 +1,4 @@
+pip>=21.0,<23.1
+colorlog
+homeassistant
+tgtg==0.14.0
