@@ -18,13 +18,13 @@ CONF_REFRESH_TOKEN = "refresh_token"
 CONF_USER_ID = "user_id"
 CONF_COOKIE = "cookie"
 CONF_USER_AGENT = "user_agent"
-ATTR_ITEM_ID = "Item ID"
-ATTR_ITEM_ID_URL = "Item URL"
-ATTR_PRICE = "TGTG Price"
-ATTR_VALUE = "Original value"
-ATTR_PICKUP_START = "Pickup start"
-ATTR_PICKUP_STOP = "Pickup stop"
-ATTR_SOLDOUT_DATE = "Soldout date"
+ATTR_ITEM_ID = "item_id"
+ATTR_ITEM_URL = "item_url"
+ATTR_PRICE = "item_price"
+ATTR_VALUE = "original_value"
+ATTR_PICKUP_START = "pickup_start"
+ATTR_PICKUP_END = "pickup_end"
+ATTR_SOLDOUT_TIMESTAMP  = "soldout_timestamp"
 _LOGGER = logging.getLogger(DOMAIN)
 
 
@@ -129,7 +129,7 @@ class TGTGSensor(SensorEntity):
         if "item" in self.tgtg_answer:
             if "item_id" in self.tgtg_answer["item"]:
                 data[ATTR_ITEM_ID] = self.tgtg_answer["item"]["item_id"]
-                data[ATTR_ITEM_ID_URL] = "https://share.toogoodtogo.com/item/" + str(
+                data[ATTR_ITEM_URL] = "https://share.toogoodtogo.com/item/" + str(
                     self.tgtg_answer["item"]["item_id"]
                 )
             if "price_including_taxes" in self.tgtg_answer["item"]:
@@ -176,9 +176,9 @@ class TGTGSensor(SensorEntity):
             if "start" in self.tgtg_answer["pickup_interval"]:
                 data[ATTR_PICKUP_START] = self.tgtg_answer["pickup_interval"]["start"]
             if "end" in self.tgtg_answer["pickup_interval"]:
-                data[ATTR_PICKUP_STOP] = self.tgtg_answer["pickup_interval"]["end"]
+                data[ATTR_PICKUP_END] = self.tgtg_answer["pickup_interval"]["end"]
         if "sold_out_at" in self.tgtg_answer:
-            data[ATTR_SOLDOUT_DATE] = self.tgtg_answer["sold_out_at"]
+            data[ATTR_SOLDOUT_TIMESTAMP] = self.tgtg_answer["sold_out_at"]
         return data
 
     def update(self) -> None:
