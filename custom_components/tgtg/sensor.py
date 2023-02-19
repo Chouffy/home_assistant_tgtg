@@ -24,7 +24,7 @@ ATTR_PRICE = "item_price"
 ATTR_VALUE = "original_value"
 ATTR_PICKUP_START = "pickup_start"
 ATTR_PICKUP_END = "pickup_end"
-ATTR_SOLDOUT_TIMESTAMP  = "soldout_timestamp"
+ATTR_SOLDOUT_TIMESTAMP = "soldout_timestamp"
 _LOGGER = logging.getLogger(DOMAIN)
 
 
