@@ -11,13 +11,6 @@
         "data_description": {
           "email": "Prüfe nach dem absenden deine E-Mails. Dieser Dialog bleibt offen und wartet bis du den Login mit der E-Mail abgeschlossen hast!"
         }
-      },
-      "init": {
-        "title": "Wähle aus deinen Favoriten",
-        "description": "Du kannst nun auswählen, welche diener favorisierten Shops du überwachen möchtest.",
-        "data": {
-          "favourites": "Favoriten"
-        }
       }
     },
     "abort": {
