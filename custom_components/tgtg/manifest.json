@@ -1,12 +1,12 @@
 {
   "domain": "tgtg",
-  "name": "TooGooToGo",
-  "version": "5.0.0",
+  "name": "TooGoodToGo",
+  "codeowners": ["@chouffy", "@tjorim", "@mricharz"],
   "integration_type": "service",
   "config_flow": true,
   "documentation": "https://github.com/Chouffy/home_assistant_tgtg",
+  "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Chouffy/home_assistant_tgtg/issues",
-  "codeowners": ["@chouffy"],
   "requirements": ["tgtg>=0.14.0"],
-  "iot_class": "cloud_polling"
+  "version": "6.0.0"
 }
