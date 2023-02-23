@@ -43,7 +43,7 @@ class TGTGConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required(CONF_EMAIL, default="manuel.richarz.tgtgtest@nysoft.de"): str
+                vol.Required(CONF_EMAIL): str
             }),
             errors=errors
         )
