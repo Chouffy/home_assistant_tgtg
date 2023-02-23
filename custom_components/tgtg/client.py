@@ -58,16 +58,15 @@ class Client:
         return self.items.get(item_id)
 
     async def update_item_details(self, item_id):
-        LOGGER.info('Updating item details: %s', item_id)
+        LOGGER.debug('Updating item details: %s', item_id)
         item = await self.fetch_item(item_id)
         # merge data
         self.items[item_id] = {**self.items[item_id], **item}
 
     async def update(self):
-        LOGGER.info('Updating TGTG. UpdateCycle: %d', self.updateCycle)
         # update all favourites every 15 minutes
         if self.updateCycle is None or self.updateCycle % 5 == 0:
-            LOGGER.info('Updating TGTG favourites ...')
+            LOGGER.debug('Updating TGTG favourites ...')
             items = await self.fetch_items()
             self.items = {d[CONF_ITEM][CONF_ITEM_ID]: d for d in items}
 
@@ -75,7 +74,7 @@ class Client:
         for item_id in self.items:
             # update item more often if item is in saleswindow
             if self.is_during_sales_window(self.items[item_id], 10):
-                LOGGER.info('Updating item details because in saleswindow...')
+                LOGGER.debug('Updating item details because in saleswindow...')
                 self.update_item_details(item_id)
             # fetch item in detail to get more data (but not so often) = 40 * DEFAULT_SCAN_INTERVAL
             elif self.updateCycle is None or self.updateCycle >= 40:
@@ -95,12 +94,12 @@ class Client:
             try:
                 current_datetime = datetime.datetime.now(datetime.timezone.utc)
             except ValueError as e:
-                LOGGER.info('Current Date Error: %s', e)
+                LOGGER.error('Current Date Error: %s', e)
 
             try:
                 sales_window = datetime.datetime.strptime(item[CONF_NEXT_SALES_WINDOW], '%Y-%m-%dT%H:%M:%S%z')
             except ValueError as e:
-                LOGGER.info('Current SalesWindow Date Error: %s', e)
+                LOGGER.error('Current SalesWindow Date Error: %s', e)
 
             return sales_window <= current_datetime <= sales_window + datetime.timedelta(minutes=salesWindowMinutes)
 
