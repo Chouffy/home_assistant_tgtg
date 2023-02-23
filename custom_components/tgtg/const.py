@@ -2,7 +2,7 @@
 from datetime import timedelta
 from typing import Final
 
-DOMAIN: Final = "tgtg_v2"
+DOMAIN: Final = "tgtg"
 CONF_FAVOURITES: Final = "favourites"
 CONF_ITEM: Final = "item"
 CONF_ITEM_ID: Final = "item_id"
