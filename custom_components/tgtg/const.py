@@ -1,0 +1,42 @@
+"""Constants for the Divera integration."""
+from datetime import timedelta
+from typing import Final
+
+DOMAIN: Final = "tgtg_v2"
+CONF_FAVOURITES: Final = "favourites"
+CONF_ITEM: Final = "item"
+CONF_ITEM_ID: Final = "item_id"
+CONF_PRICE_INCL_TAX: Final = "price_including_taxes"
+CONF_VALUE_INCL_TAX: Final = "value_including_taxes"
+CONF_ITEM_START: Final = "start"
+CONF_ITEM_END: Final = "end"
+CONF_ITEM_LOGO_PICTURE: Final = "logo_picture"
+CONF_PICKUP_INTERVAL: Final = "pickup_interval"
+CONF_SOLD_OUT_AT: Final = "sold_out_at"
+CONF_NEXT_SALES_WINDOW: Final = "next_sales_window_purchase_start"
+CONF_ACCESS_TOKEN: Final = "access_token"
+CONF_REFRESH_TOKEN: Final = "refresh_token"
+CONF_USER_EMAIL: Final = "email"
+CONF_USER_ID: Final = "user_id"
+CONF_COOKIE: Final = "cookie"
+CONF_USER_AGENT: Final = "user_agent"
+CONF_STORE: Final = "store"
+CONF_STORE_ID: Final = "store_id"
+ATTR_ITEM_ID: Final = "item_id"
+ATTR_ITEM_ID_URL: Final = "item_url"
+ATTR_STORE_ID: Final = "store_id"
+ATTR_PRICE: Final = "price"
+ATTR_VALUE: Final = "value"
+ATTR_PICKUP_START: Final = "pickup_start"
+ATTR_PICKUP_STOP: Final = "pickup_stop"
+ATTR_SOLDOUT_DATE: Final = "soldout_date"
+ATTR_NEXT_SALES_WINDOW_DATE: Final = "next_saleswindow"
+ATTR_LOGO_PICTURE:Final = "store_logo_url"
+
+TGTG_NAME = "tgtg_name"
+TGTG_CLIENT = "tgtg_client"
+TGTG_COORDINATOR = "tgtg_coordinator"
+
+DEFAULT_SHORT_NAME = "TGTG Store"
+
+DEFAULT_SCAN_INTERVAL = timedelta(minutes=3)

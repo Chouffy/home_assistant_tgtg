@@ -1,0 +1,27 @@
+{
+  "title": "TooGoodToGo V2",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Signin to TGTG",
+        "description": "You need to sign in to your TGTG Account",
+        "data": {
+          "email": "Your Email"
+        },
+        "data_description": {
+          "email": "Check your mails after sending. This Dialog will stay and wait until you finished the singin with the email!"
+        }
+      },
+      "init": {
+        "title": "Choose from your favourites",
+        "description": "You can now choose which of your favorite stores you want to monitor.",
+        "data": {
+          "favourites": "Favourites"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This TGTG-Account is already configured!"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "TooGoodToGo V2",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Login zu TGTG",
+        "description": "Gib die E-Mail deines TGTG-Benutzerkontos ein",
+        "data": {
+          "email": "E-Mail"
+        },
+        "data_description": {
+          "email": "Prüfe nach dem absenden deine E-Mails. Dieser Dialog bleibt offen und wartet bis du den Login mit der E-Mail abgeschlossen hast!"
+        }
+      },
+      "init": {
+        "title": "Wähle aus deinen Favoriten",
+        "description": "Du kannst nun auswählen, welche diener favorisierten Shops du überwachen möchtest.",
+        "data": {
+          "favourites": "Favoriten"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Dieses TGTG-Konto ist bereits konfiguriert!"
+    }
+  }
+}
