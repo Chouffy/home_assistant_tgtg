@@ -34,3 +34,24 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 - Every 2 hours the details of an item (for every item in favourites list) are fetched to update the saleswindow and/or pickup dates and other data of the item
 - If an item is inside his saleswindow (from start of saleswindow till 10 minutes later) it will be fetched more frequently (every 3 minutes)
 
+## Example Automation
+
+As example we'll create a notification using the HomeAssistant Companion App on your smartphone.
+
+```
+alias: TGTG Q1 Notification
+description: ""
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.schaal_mehr_als_tanken_q1_tankstelle_karlsruhe_uberraschungstute
+    above: 0
+condition: []
+action:
+  - service: notify.notify
+    data:
+      message: Q1 gas station has new packages available
+      title: TGTG Notification
+mode: single
+```
+
+As soon as the number of your entry is higher than 0, this is immediately sent to you via push notification to the Companion App and displayed on your cell phone.
