@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Signin to TGTG",
+        "description": "You need to sign in to your TGTG Account",
+        "data": {
+          "email": "Your Email"
+        },
+        "data_description": {
+          "email": "Check your mails after sending. This Dialog will stay and wait until you finished the singin with the email!"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This TGTG-Account is already configured!"
+    }
+  }
+}

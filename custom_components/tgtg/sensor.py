@@ -1,192 +1,172 @@
 """Platform for sensor integration."""
-from __future__ import annotations
 import logging
-import voluptuous as vol
 
-from tgtg import TgtgClient
-
+from homeassistant.helpers.typing import ConfigType, HomeAssistantType
 from homeassistant.components.sensor import SensorEntity, PLATFORM_SCHEMA
-from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_EMAIL
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-from homeassistant.helpers import config_validation as cv
 
-DOMAIN = "tgtg"
-CONF_ITEM = "item"
-CONF_REFRESH_TOKEN = "refresh_token"
-CONF_USER_ID = "user_id"
-CONF_COOKIE = "cookie"
-CONF_USER_AGENT = "user_agent"
-ATTR_ITEM_ID = "item_id"
-ATTR_ITEM_URL = "item_url"
-ATTR_PRICE = "item_price"
-ATTR_VALUE = "original_value"
-ATTR_PICKUP_START = "pickup_start"
-ATTR_PICKUP_END = "pickup_end"
-ATTR_SOLDOUT_TIMESTAMP = "soldout_timestamp"
-_LOGGER = logging.getLogger(DOMAIN)
-
-
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Required(CONF_ACCESS_TOKEN): cv.string,
-        vol.Required(CONF_REFRESH_TOKEN): cv.string,
-        vol.Required(CONF_USER_ID): cv.string,
-        vol.Required(CONF_COOKIE): cv.string,
-        vol.Optional(CONF_EMAIL): vol.Email(),
-        vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
-        vol.Optional(CONF_USER_AGENT, default=""): cv.string,
-    }
+from .const import (
+    DOMAIN,
+    CONF_ITEM,
+    CONF_ITEM_ID,
+    CONF_PRICE_INCL_TAX,
+    CONF_VALUE_INCL_TAX,
+    CONF_ITEM_END,
+    CONF_ITEM_START,
+    CONF_ITEM_LOGO_PICTURE,
+    CONF_PICKUP_INTERVAL,
+    CONF_NEXT_SALES_WINDOW,
+    CONF_SOLD_OUT_AT,
+    CONF_STORE,
+    CONF_STORE_ID,
+    ATTR_ITEM_ID,
+    ATTR_ITEM_ID_URL,
+    ATTR_PRICE,
+    ATTR_VALUE,
+    ATTR_PICKUP_START,
+    ATTR_PICKUP_STOP,
+    ATTR_SOLDOUT_DATE,
+    ATTR_NEXT_SALES_WINDOW_DATE,
+    ATTR_LOGO_PICTURE,
+    ATTR_STORE_ID,
+    TGTG_NAME,
+    TGTG_CLIENT,
+    TGTG_COORDINATOR,
+    DEFAULT_SHORT_NAME
 )
 
-global tgtg_client
+LOGGER = logging.getLogger(__name__)
 
-
-def setup_platform(
-    hass: HomeAssistant,
-    config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+async def async_setup_entry(
+        hass: HomeAssistantType, entry: ConfigType, async_add_entities
 ) -> None:
-    """Set up the sensor platform."""
+    """Set up the TGTG sensor platform."""
+    LOGGER.info("Setting up TGTG sensor platform.")
 
-    email = config.get(CONF_EMAIL)
-    item = config[CONF_ITEM]
-    access_token = config[CONF_ACCESS_TOKEN]
-    refresh_token = config[CONF_REFRESH_TOKEN]
-    user_id = config[CONF_USER_ID]
-    cookie = config[CONF_COOKIE]
-    user_agent = config[CONF_USER_AGENT]
+    hass_data = hass.data[DOMAIN][entry.entry_id]
+    LOGGER.debug(hass.data[DOMAIN])
+    items = hass_data[TGTG_CLIENT].items
 
-    global tgtg_client
+    for item_id in items:
+        async_add_entities([
+            TGTGItemSensor(hass_data, item_id)
+        ])
 
-    # Log in with tokens
-    tgtg_client = TgtgClient(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        user_id=user_id,
-        cookie=cookie,
-        user_agent=user_agent,
-    )
-
-    # If item: isn't defined, use favorites - otherwise use defined items
-    if item != [""]:
-        for each_item_id in item:
-            add_entities([TGTGSensor(each_item_id)])
-    else:
-        tgtgReply = tgtg_client.get_items()
-        for item in tgtgReply:
-            add_entities([TGTGSensor(item["item"]["item_id"])])
-
-
-class TGTGSensor(SensorEntity):
+class TGTGItemSensor(SensorEntity):
     """Representation of a Sensor."""
 
-    global tgtg_client
-
-    tgtg_answer = None
-    item_id = None
-    store_name = None
-    item_qty = None
-
-    def __init__(self, item_id):
+    def __init__(self, hass_data, item_id):
         """Initialize the sensor."""
+        self._client = hass_data[TGTG_CLIENT]
+        self._coordinator = hass_data[TGTG_COORDINATOR]
+
+        self._name = f"{DEFAULT_SHORT_NAME} {item_id}"
+        self._unique_id = f"{DOMAIN}_{hass_data[TGTG_NAME]}_store_{item_id}"
+        self._icon = "mdi:storefront-outline"
+        self._unit_of_measurement = "pcs"
         self.item_id = item_id
-        self.update()
+
+        LOGGER.info(f'Setting up TGTG Sensor {self._unique_id}.')
+
+    def get_item(self):
+        return self._client.get_item(self.item_id)
 
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
-        return f"TGTG {self.store_name}"
+        store_name = self.get_item()['store']['store_name']
+        display_name = self.get_item()['display_name']
+        if display_name:
+            return display_name
+        if store_name:
+            return store_name
+        return self._name
 
     @property
-    def unique_id(self) -> str:
-        """Return a unique ID."""
-        return f"tgtg_{self.item_id}"
+    def unique_id(self):
+        """Return the unique of the sensor."""
+        return self._unique_id
 
     @property
     def icon(self):
-        """Return an icon."""
-        return "mdi:storefront-outline"
+        """Return the icon of the sensor."""
+        return self._icon
 
     @property
     def unit_of_measurement(self):
-        """Return the unit of measurement."""
-        return "pcs"
+        """Return the unit_of_measurement of the sensor."""
+        return self._unit_of_measurement
 
     @property
     def native_value(self) -> str:
         """Return the state of the sensor."""
-        return self.item_qty
+        return self.get_item()['items_available']
+
+    @property
+    def state(self) -> str:
+        """Return the state of the sensor."""
+        return self.get_item()['items_available']
+
+    async def async_added_to_hass(self) -> None:
+        """Set up a listener and load data."""
+        self.async_on_remove(
+            self._coordinator.async_add_listener(self.async_write_ha_state)
+        )
+
+    async def async_update(self):
+        """Schedule a custom update via the common entity update service."""
+        await self._coordinator.async_request_refresh()
 
     @property
     def extra_state_attributes(self) -> dict | None:
         """Return the optional state attributes."""
-        if not self.tgtg_answer:
-            return None
         data = {}
-        if "item" in self.tgtg_answer:
-            if "item_id" in self.tgtg_answer["item"]:
-                data[ATTR_ITEM_ID] = self.tgtg_answer["item"]["item_id"]
-                data[ATTR_ITEM_URL] = "https://share.toogoodtogo.com/item/" + str(
-                    self.tgtg_answer["item"]["item_id"]
-                )
-            if "price_including_taxes" in self.tgtg_answer["item"]:
-                data[ATTR_PRICE] = (
-                    str(
-                        int(
-                            self.tgtg_answer["item"]["price_including_taxes"][
-                                "minor_units"
-                            ]
-                        )
-                        / pow(
-                            10,
-                            int(
-                                self.tgtg_answer["item"]["price_including_taxes"][
-                                    "decimals"
-                                ]
-                            ),
-                        )
-                    )
-                    + " "
-                    + self.tgtg_answer["item"]["price_including_taxes"]["code"]
-                )
-            if "value_including_taxes" in self.tgtg_answer["item"]:
-                data[ATTR_VALUE] = (
-                    str(
-                        int(
-                            self.tgtg_answer["item"]["value_including_taxes"][
-                                "minor_units"
-                            ]
-                        )
-                        / pow(
-                            10,
-                            int(
-                                self.tgtg_answer["item"]["value_including_taxes"][
-                                    "decimals"
-                                ]
-                            ),
-                        )
-                    )
-                    + " "
-                    + self.tgtg_answer["item"]["value_including_taxes"]["code"]
-                )
-        if "pickup_interval" in self.tgtg_answer:
-            if "start" in self.tgtg_answer["pickup_interval"]:
-                data[ATTR_PICKUP_START] = self.tgtg_answer["pickup_interval"]["start"]
-            if "end" in self.tgtg_answer["pickup_interval"]:
-                data[ATTR_PICKUP_END] = self.tgtg_answer["pickup_interval"]["end"]
-        if "sold_out_at" in self.tgtg_answer:
-            data[ATTR_SOLDOUT_TIMESTAMP] = self.tgtg_answer["sold_out_at"]
+
+        entry = self.get_item()
+
+        item = entry[CONF_ITEM]
+        if CONF_ITEM_ID in item:
+            item_id = item[CONF_ITEM_ID]
+            data[ATTR_ITEM_ID] = item_id
+            data[ATTR_ITEM_ID_URL] = f"https://share.toogoodtogo.com/item/{item_id}"
+        if CONF_PRICE_INCL_TAX in item:
+            attr = item[CONF_PRICE_INCL_TAX]
+            minor_units = attr["minor_units"]
+            decimals = attr["decimals"]
+            code = attr["code"]
+            data[ATTR_PRICE] = f"{str( int(minor_units) / pow(10, int(decimals)) )} {code}"
+        if CONF_VALUE_INCL_TAX in item:
+            attr = item[CONF_VALUE_INCL_TAX]
+            minor_units = attr["minor_units"]
+            decimals = attr["decimals"]
+            code = attr["code"]
+            data[ATTR_VALUE] = f"{str( int(minor_units) / pow(10, int(decimals)) )} {code}"
+        if CONF_ITEM_LOGO_PICTURE in item:
+            data[ATTR_LOGO_PICTURE] = item[CONF_ITEM_LOGO_PICTURE]['current_url']
+
+        store = entry[CONF_STORE]
+        if CONF_STORE_ID in store:
+            data[ATTR_STORE_ID] = store[CONF_STORE_ID]
+
+        if CONF_PICKUP_INTERVAL in entry:
+            if CONF_ITEM_START in entry[CONF_PICKUP_INTERVAL]:
+                data[ATTR_PICKUP_START] = entry[CONF_PICKUP_INTERVAL][CONF_ITEM_START]
+            if CONF_ITEM_END in entry[CONF_PICKUP_INTERVAL]:
+                data[ATTR_PICKUP_STOP] = entry[CONF_PICKUP_INTERVAL][CONF_ITEM_END]
+        if CONF_SOLD_OUT_AT in entry:
+            data[ATTR_SOLDOUT_DATE] = entry[CONF_SOLD_OUT_AT]
+
+        if CONF_NEXT_SALES_WINDOW in entry:
+            data[ATTR_NEXT_SALES_WINDOW_DATE] = entry[CONF_NEXT_SALES_WINDOW]
+
         return data
 
-    def update(self) -> None:
-        """Fetch new state data for the sensor.
-        This is the only method that should fetch new data for Home Assistant.
-        """
-        global tgtg_client
-        self.tgtg_answer = tgtg_client.get_item(item_id=self.item_id)
+    @property
+    def available(self):
+        """Return if state is available."""
+        return self.get_item() is not None
 
-        self.store_name = self.tgtg_answer["display_name"]
-        self.item_qty = self.tgtg_answer["items_available"]
+    @property
+    def should_poll(self) -> bool:
+        """Entities do not individually poll."""
+        return False
+
