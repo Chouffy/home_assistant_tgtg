@@ -1,5 +1,6 @@
 import logging
 import datetime
+import time
 
 from tgtg import TgtgClient
 
@@ -48,11 +49,26 @@ class Client:
     async def fetch_favourites(self):
         return await self.hass.async_add_executor_job(self.tgtg.get_favourites)
 
-    async def fetch_items(self):
-        return await self.hass.async_add_executor_job(self.tgtg.get_items)
+    async def fetch_items(self, *args, **kwargs):
+        return await self.hass.async_add_executor_job(lambda: self.tgtg.get_items(*args, **kwargs))
 
     async def fetch_item(self, item_id):
         return await self.hass.async_add_executor_job(self.tgtg.get_item, item_id)
+
+    # fetch_items per page until result == 0 (to get all pages)
+    async def fetch_all_items(self, *args, **kwargs):
+        items_list = {}
+        page = 1
+        while True:
+            LOGGER.debug('Fetching page: %d', page)
+            extended_kwargs = {'page': page, **kwargs}
+            items = await self.fetch_items(*args, **extended_kwargs)
+            page += 1
+            if len(items) == 0:
+                break
+            for d in items:
+                items_list[d[CONF_ITEM][CONF_ITEM_ID]] = d
+        return items_list
 
     def get_item(self, item_id):
         return self.items.get(item_id)
@@ -67,8 +83,8 @@ class Client:
         # update all favourites every 15 minutes
         if self.updateCycle is None or self.updateCycle % 5 == 0:
             LOGGER.debug('Updating TGTG favourites ...')
-            items = await self.fetch_items()
-            self.items = {d[CONF_ITEM][CONF_ITEM_ID]: d for d in items}
+            self.items = await self.fetch_all_items()
+            LOGGER.info('Got %d favourites', len(self.items))
 
         # update details of each item
         for item_id in self.items:
@@ -76,9 +92,11 @@ class Client:
             if self.is_during_sales_window(self.items[item_id], 10):
                 LOGGER.debug('Updating item details because in saleswindow...')
                 self.update_item_details(item_id)
+                time.sleep(0.5) # sleep for 500ms to not flood tgtg api
             # fetch item in detail to get more data (but not so often) = 40 * DEFAULT_SCAN_INTERVAL
             elif self.updateCycle is None or self.updateCycle >= 40:
                 await self.update_item_details(item_id)
+                time.sleep(0.5) # sleep for 500ms to not flood tgtg api
 
         # reset updateCycle
         if self.updateCycle is None or self.updateCycle >= 40:
