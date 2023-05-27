@@ -2,4 +2,4 @@ pip>=21.0,<23.2
 colorlog
 homeassistant
 # To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
-tgtg==0.14.0
+tgtg==0.16.0
