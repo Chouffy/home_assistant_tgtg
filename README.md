@@ -124,6 +124,8 @@ filter:
     {%- endfor %}
 ```
 
+![image](https://github.com/Chouffy/home_assistant_tgtg/assets/1294876/db2899ac-0023-4c8b-9f61-07e764408e1f)
+
 ## Q&A
 
 - It was working before, but now all Too Good To Go sensors are "not available"
