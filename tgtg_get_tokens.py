@@ -9,7 +9,7 @@ from tgtg import TgtgClient
 email = input("Type your email linked to your TGTG account: ")
 
 # Set up a tgtg client
-tgtgClient = TgtgClient(email=email)
+tgtgClient = TgtgClient(email=email,language="en-GB")
 tgtgClient.get_credentials()
 
 # You should receive an email from TGTG: click the link inside to continue.
