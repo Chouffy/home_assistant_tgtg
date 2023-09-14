@@ -13,8 +13,8 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
   - Price and original value
   - Pick-up start and end
   - Sold-out date
-- Dashboard card example
-
+- [Dashboard card example
+](https://github.com/Chouffy/home_assistant_tgtg?tab=readme-ov-file#dashboard-card-example)
 ## Installation
 
 Two steps are required:
