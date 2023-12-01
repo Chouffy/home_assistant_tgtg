@@ -25,6 +25,10 @@ ATTR_VALUE = "original_value"
 ATTR_PICKUP_START = "pickup_start"
 ATTR_PICKUP_END = "pickup_end"
 ATTR_SOLDOUT_TIMESTAMP = "soldout_timestamp"
+ATTR_ORDERS_PLACED = "orders_placed"
+ATTR_TOTAL_QUANTITY_ORDERED = "total_quantity_ordered"
+ATTR_PICKUP_WINDOW_CHANGED = "pickup_window_changed"
+ATTR_CANCEL_UNTIL = "cancel_until"
 _LOGGER = logging.getLogger(DOMAIN)
 
 
@@ -87,6 +91,7 @@ class TGTGSensor(SensorEntity):
     global tgtg_client
 
     tgtg_answer = None
+    tgtg_orders = None
     item_id = None
     store_name = None
     item_qty = None
@@ -180,6 +185,22 @@ class TGTGSensor(SensorEntity):
                 data[ATTR_PICKUP_END] = self.tgtg_answer["pickup_interval"]["end"]
         if "sold_out_at" in self.tgtg_answer:
             data[ATTR_SOLDOUT_TIMESTAMP] = self.tgtg_answer["sold_out_at"]
+
+        orders_placed = 0
+        total_quantity_ordered = 0
+        for order in self.tgtg_orders:
+            if "item_id" in order:
+                if order["item_id"] == self.item_id:
+                    orders_placed += 1
+                    if "quantity" in order:
+                        total_quantity_ordered += order["quantity"]
+                    if "pickup_window_changed" in order:
+                        data[ATTR_PICKUP_WINDOW_CHANGED] = order["pickup_window_changed"]
+                    if "cancel_until" in order:
+                        data[ATTR_CANCEL_UNTIL] = order["cancel_until"]
+        data[ATTR_ORDERS_PLACED] = orders_placed
+        if total_quantity_ordered > 0:
+            data[ATTR_TOTAL_QUANTITY_ORDERED] = total_quantity_ordered
         return data
 
     def update(self) -> None:
@@ -188,6 +209,7 @@ class TGTGSensor(SensorEntity):
         """
         global tgtg_client
         self.tgtg_answer = tgtg_client.get_item(item_id=self.item_id)
+        self.tgtg_orders = tgtg_client.get_active()["orders"]
 
         self.store_name = self.tgtg_answer["display_name"]
         self.item_qty = self.tgtg_answer["items_available"]
