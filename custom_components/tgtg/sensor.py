@@ -190,7 +190,7 @@ class TGTGSensor(SensorEntity):
         total_quantity_ordered = 0
         for order in self.tgtg_orders:
             if "item_id" in order:
-                if order["item_id"] == self.item_id:
+                if order["item_id"] == str(self.item_id):
                     orders_placed += 1
                     if "quantity" in order:
                         total_quantity_ordered += order["quantity"]
