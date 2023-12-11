@@ -14,9 +14,9 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
   - Pick-up start and end time
   - Sold-out time
   - Orders placed (if above 0, then below attributes also appear)
-  - Total quantity ordered (total from 1 or more orders placed)
-  - Pickup window changed (true/false)
-  - Cancel-until time
+    - Total quantity ordered (total from 1 or more orders placed)
+    - Pickup window changed (true/false)
+    - Cancel-until time
 - [Dashboard card example
 ](https://github.com/Chouffy/home_assistant_tgtg?tab=readme-ov-file#dashboard-card-example)
 ## Installation
