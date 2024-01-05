@@ -138,7 +138,7 @@ class TGTGSensor(SensorEntity):
                 data[ATTR_ITEM_URL] = "https://share.toogoodtogo.com/item/" + str(
                     self.tgtg_answer["item"]["item_id"]
                 )
-            if "price_including_taxes" in self.tgtg_answer["item"]:
+            if "item_price" in self.tgtg_answer["item"]:
                 data[ATTR_PRICE] = (
                     str(
                         int(
@@ -158,7 +158,7 @@ class TGTGSensor(SensorEntity):
                     + " "
                     + self.tgtg_answer["item"]["item_price"]["code"]
                 )
-            if "value_including_taxes" in self.tgtg_answer["item"]:
+            if "item_value" in self.tgtg_answer["item"]:
                 data[ATTR_VALUE] = (
                     str(
                         int(
