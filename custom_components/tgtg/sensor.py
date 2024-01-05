@@ -142,41 +142,41 @@ class TGTGSensor(SensorEntity):
                 data[ATTR_PRICE] = (
                     str(
                         int(
-                            self.tgtg_answer["item"]["price_including_taxes"][
+                            self.tgtg_answer["item"]["item_price"][
                                 "minor_units"
                             ]
                         )
                         / pow(
                             10,
                             int(
-                                self.tgtg_answer["item"]["price_including_taxes"][
+                                self.tgtg_answer["item"]["item_price"][
                                     "decimals"
                                 ]
                             ),
                         )
                     )
                     + " "
-                    + self.tgtg_answer["item"]["price_including_taxes"]["code"]
+                    + self.tgtg_answer["item"]["item_price"]["code"]
                 )
             if "value_including_taxes" in self.tgtg_answer["item"]:
                 data[ATTR_VALUE] = (
                     str(
                         int(
-                            self.tgtg_answer["item"]["value_including_taxes"][
+                            self.tgtg_answer["item"]["item_value"][
                                 "minor_units"
                             ]
                         )
                         / pow(
                             10,
                             int(
-                                self.tgtg_answer["item"]["value_including_taxes"][
+                                self.tgtg_answer["item"]["item_value"][
                                     "decimals"
                                 ]
                             ),
                         )
                     )
                     + " "
-                    + self.tgtg_answer["item"]["value_including_taxes"]["code"]
+                    + self.tgtg_answer["item"]["item_value"]["code"]
                 )
         if "pickup_interval" in self.tgtg_answer:
             if "start" in self.tgtg_answer["pickup_interval"]:
