@@ -98,7 +98,7 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 
 ## Dashboard card example
 
-Here is an example for a card on your Home Assistant dashboard created by @wallieboy and updated by @Sarnog in https://github.com/Chouffy/home_assistant_tgtg/issues/73. \
+Here is an example for a card on your Home Assistant dashboard created by @wallieboy, updated by @Sarnog in https://github.com/Chouffy/home_assistant_tgtg/issues/73 and @tjorim. \
 Make sure you install the custom `auto-entities` and `multiple-entity-row` cards as well.
 
 ```yaml
