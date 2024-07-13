@@ -108,24 +108,29 @@ card:
   title: TGTG Surprise Bags
 filter:
   template: |-
-    {% for state in states.sensor -%}
-      {%- if state.state|float(default=0) >= 1  and 'sensor.tgtg_' in state.entity_id %}
-      {%- if state_attr(state.entity_id, 'pickup_start') is not none -%}
-        {{
-          {
-            'entity': state.entity_id,
-            'name': state.attributes.friendly_name[5:],
-            'type': "custom:multiple-entity-row",
-            'unit': false,
-            'secondary_info': 'Pickup on ' + state.attributes.pickup_start[8:10] + "-" + state.attributes.pickup_start[5:7] + ' between '+ state.attributes.pickup_start[11:16] + ' and ' + state.attributes.pickup_end[11:16] + ', € '+  state.attributes.item_price[:-3],
-            'tap_action': {
-              'action': 'url',
-              'url_path': state.attributes.item_url}
+    {% for state in states.sensor if 'sensor.tgtg_' in state.entity_id %}
+      {% set entity_id = state.entity_id %}
+      {% set state = states(entity_id) %}
+      {%- if is_number(state) and state | int > 0 %}
+        {% set pickup_start = state_attr(entity_id, 'pickup_start') %}
+        {%- if pickup_start is not none -%}
+          {{
+            {
+              'entity': entity_id,
+              'name': state_attr(entity_id, 'friendly_name')[5:],
+              'type': "custom:multiple-entity-row",
+              'unit': false,
+              'secondary_info': as_timestamp(pickup_start) | timestamp_custom('Pickup on %d-%m between %H:%M and ', true) + as_timestamp(state_attr(entity_id, 'pickup_end')) | timestamp_custom('%H:%M, € ', true) + state_attr(entity_id, 'item_price')[:-3],
+              'tap_action': {
+                'action': 'url',
+                'url_path': state_attr(entity_id, 'item_url')
+              }
             }
-        }},
-      {%- endif -%}
+          }},
+        {%- endif -%}
       {%- endif -%}
     {%- endfor %}
+
 ```
 
 ![image](https://github.com/Chouffy/home_assistant_tgtg/assets/1294876/db2899ac-0023-4c8b-9f61-07e764408e1f)
