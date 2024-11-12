@@ -29,6 +29,8 @@ ATTR_ORDERS_PLACED = "orders_placed"
 ATTR_TOTAL_QUANTITY_ORDERED = "total_quantity_ordered"
 ATTR_PICKUP_WINDOW_CHANGED = "pickup_window_changed"
 ATTR_CANCEL_UNTIL = "cancel_until"
+ATTR_LOGO_URL = "logo_url"
+ATTR_COVER_URL = "cover_url"
 _LOGGER = logging.getLogger(DOMAIN)
 
 
@@ -178,6 +180,11 @@ class TGTGSensor(SensorEntity):
                     + " "
                     + self.tgtg_answer["item"]["item_value"]["code"]
                 )
+
+            if "logo_picture" in self.tgtg_answer["item"]:
+                data[ATTR_LOGO_URL] = self.tgtg_answer["item"]["logo_picture"]["current_url"]
+            if "cover_picture" in self.tgtg_answer["item"]:
+                data[ATTR_COVER_URL] = self.tgtg_answer["item"]["cover_picture"]["current_url"]
         if "pickup_interval" in self.tgtg_answer:
             if "start" in self.tgtg_answer["pickup_interval"]:
                 data[ATTR_PICKUP_START] = self.tgtg_answer["pickup_interval"]["start"]
