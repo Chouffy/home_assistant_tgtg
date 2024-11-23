@@ -74,7 +74,6 @@ def setup_platform(
         user_id=user_id,
         cookie=cookie,
         user_agent=user_agent,
-        language="en-GB",
     )
 
     # If item: isn't defined, use favorites - otherwise use defined items
