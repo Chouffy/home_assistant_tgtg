@@ -35,7 +35,7 @@ This is to be executed outside of Home Assistant, i.e. on your local machine.
 
 1. Install required packages.
    - [Python >=3.8](https://www.python.org/downloads/)
-   - [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg>=0.11.0` or `pip install --upgrade tgtg` if you already have it.
+   - [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg==0.18.0` or `pip install --upgrade tgtg` if you already have it.
 1. Run the [tgtg_get_tokens](./tgtg_get_tokens.py) script to get access and refresh token. Save these for later.
 
 #### 1b. Docker
@@ -69,7 +69,6 @@ sensor:
     # Mandatory: tokens for authentication - see the tgtg_get_tokens.py script
     access_token: "abc123"
     refresh_token: "abc123"
-    user_id: "123456"
     cookie: "datadome=..."
 
     # Optional: Refresh the stock every 15 minutes
@@ -81,12 +80,9 @@ sensor:
       - 1234
       # item_id 2
       - 5678
-
-    # Optional: user agent - by default, the latest one is retrieved from the Google Play store
-    #user_agent: "TGTG/22.2.1 Dalvik/2.1.0 (Linux; U; Android 9; SM-G955F Build/PPR1.180610.011)"
 ```
 
-`access_token`, `refresh_token`, `user_id` and `cookie` can be retrieved using the [tgtg_get_tokens](./tgtg_get_tokens.py) script!
+`access_token`, `refresh_token` and `cookie` can be retrieved using the [tgtg_get_tokens](./tgtg_get_tokens.py) script!
 
 ### How to get item_id
 

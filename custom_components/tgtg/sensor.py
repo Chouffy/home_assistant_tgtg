@@ -15,7 +15,6 @@ from homeassistant.helpers import config_validation as cv
 DOMAIN = "tgtg"
 CONF_ITEM = "item"
 CONF_REFRESH_TOKEN = "refresh_token"
-CONF_USER_ID = "user_id"
 CONF_COOKIE = "cookie"
 CONF_USER_AGENT = "user_agent"
 ATTR_ITEM_ID = "item_id"
@@ -38,8 +37,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Required(CONF_ACCESS_TOKEN): cv.string,
         vol.Required(CONF_REFRESH_TOKEN): cv.string,
-        vol.Required(CONF_USER_ID): cv.string,
         vol.Required(CONF_COOKIE): cv.string,
+        vol.Optional("user_id"): cv.string,
         vol.Optional(CONF_EMAIL): vol.Email(),
         vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
         vol.Optional(CONF_USER_AGENT, default=""): cv.string,
@@ -61,7 +60,6 @@ def setup_platform(
     item = config[CONF_ITEM]
     access_token = config[CONF_ACCESS_TOKEN]
     refresh_token = config[CONF_REFRESH_TOKEN]
-    user_id = config[CONF_USER_ID]
     cookie = config[CONF_COOKIE]
     user_agent = config[CONF_USER_AGENT]
 
@@ -71,7 +69,6 @@ def setup_platform(
     tgtg_client = TgtgClient(
         access_token=access_token,
         refresh_token=refresh_token,
-        user_id=user_id,
         cookie=cookie,
         user_agent=user_agent,
     )
@@ -184,6 +181,7 @@ class TGTGSensor(SensorEntity):
                 data[ATTR_LOGO_URL] = self.tgtg_answer["item"]["logo_picture"]["current_url"]
             if "cover_picture" in self.tgtg_answer["item"]:
                 data[ATTR_COVER_URL] = self.tgtg_answer["item"]["cover_picture"]["current_url"]
+
         if "pickup_interval" in self.tgtg_answer:
             if "start" in self.tgtg_answer["pickup_interval"]:
                 data[ATTR_PICKUP_START] = self.tgtg_answer["pickup_interval"]["start"]
