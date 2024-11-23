@@ -38,8 +38,8 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Required(CONF_ACCESS_TOKEN): cv.string,
         vol.Required(CONF_REFRESH_TOKEN): cv.string,
-        vol.Required(CONF_USER_ID): cv.string,
         vol.Required(CONF_COOKIE): cv.string,
+        vol.Optional(CONF_USER_ID): cv.string,
         vol.Optional(CONF_EMAIL): vol.Email(),
         vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
         vol.Optional(CONF_USER_AGENT, default=""): cv.string,
@@ -61,7 +61,6 @@ def setup_platform(
     item = config[CONF_ITEM]
     access_token = config[CONF_ACCESS_TOKEN]
     refresh_token = config[CONF_REFRESH_TOKEN]
-    user_id = config[CONF_USER_ID]
     cookie = config[CONF_COOKIE]
     user_agent = config[CONF_USER_AGENT]
 
@@ -71,7 +70,6 @@ def setup_platform(
     tgtg_client = TgtgClient(
         access_token=access_token,
         refresh_token=refresh_token,
-        user_id=user_id,
         cookie=cookie,
         user_agent=user_agent,
         language="en-GB",
