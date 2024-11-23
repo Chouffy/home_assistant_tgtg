@@ -98,7 +98,7 @@ Check the [tgtg_get_favorites_item_id](./tgtg_get_favorites_item_id.py) script!
 
 ## Dashboard card example
 
-Here is an example for a card on your Home Assistant dashboard created by @wallieboy, updated by @Sarnog in https://github.com/Chouffy/home_assistant_tgtg/issues/73 and @tjorim. \
+Here is an example for a card on your Home Assistant dashboard created by @wallieboy, updated by @Sarnog in https://github.com/Chouffy/home_assistant_tgtg/issues/73 and @tjorim. Support for images was later added by @ov3rk1ll in https://github.com/Chouffy/home_assistant_tgtg/pull/139.\
 Make sure you install the custom `auto-entities` and `multiple-entity-row` cards as well.
 
 ```yaml
@@ -121,6 +121,7 @@ filter:
               'type': "custom:multiple-entity-row",
               'unit': false,
               'secondary_info': as_timestamp(pickup_start) | timestamp_custom('Pickup on %d-%m between %H:%M and ', true) + as_timestamp(state_attr(entity_id, 'pickup_end')) | timestamp_custom('%H:%M, € ', true) + state_attr(entity_id, 'item_price')[:-3],
+              'image': state_attr(entity_id, 'logo_url'),
               'tap_action': {
                 'action': 'url',
                 'url_path': state_attr(entity_id, 'item_url')
