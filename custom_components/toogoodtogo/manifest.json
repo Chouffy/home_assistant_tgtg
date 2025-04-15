@@ -1,6 +1,7 @@
 {
   "domain": "tgtg",
   "name": "TooGoodToGo",
+  "config_flow": true,
   "codeowners": ["@chouffy", "@tjorim"],
   "documentation": "https://github.com/Chouffy/home_assistant_tgtg",
   "iot_class": "cloud_polling",

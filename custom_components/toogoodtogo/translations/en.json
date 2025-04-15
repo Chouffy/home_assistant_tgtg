@@ -1,0 +1,30 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Setup your Too Good To Go account",
+                "data": {
+                    "email": "Email"
+                }
+            },
+            "item_ids": {
+                "description": "Optional item IDs to collect\n\nBy default this integration only collects favourite items from the app, if you want to see other items, add them here.",
+                "data": {
+                    "item_ids": "Item IDs"
+                }
+            },
+            "finished": {
+                "description": "Login successful"
+            }
+        },
+        "progress": {
+            "login": "Click the magic link in your mailbox on PC to continue...\n(Opening the email on mobile won't work, if you have the Too Good To Go app installed.)"
+        },
+        "error": {
+            "login_failed": "Authentication failed. Check the logs for more information."
+        },
+        "abort": {
+            "already_configured": "This user is already configured."
+        }
+    }
+}
