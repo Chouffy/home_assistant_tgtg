@@ -1,6 +1,8 @@
 """Too Good To Go config flow."""
 
+import asyncio
 import logging
+import json
 from typing import Any
 
 import voluptuous as vol
@@ -8,7 +10,7 @@ from homeassistant.helpers import selector
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_EMAIL, CONF_ACCESS_TOKEN
 
-from tgtg import TgtgClient
+from tgtg import TgtgClient, TgtgLoginError
 
 from .const import DOMAIN, CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS
 
@@ -38,6 +40,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             await self.hass.async_add_executor_job(self._tgtg.login)
             if self._tgtg.access_token is not None:
                 break
+            await asyncio.sleep(5) # attempt to prevent captcha
 
     async def async_step_user(
             self, user_input: dict[str, Any] | None = None
@@ -52,6 +55,22 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=LOGIN_SCHEMA,
             errors=errors
+        )
+
+    async def async_step_captcha(
+        self, user_input: dict[str, Any] | None = None
+    ):
+        """Captcha required step."""
+        if user_input is not None:
+            self._login_task = None
+            return await self.async_step_login()
+        return self.async_show_form(
+            step_id="captcha",
+            description_placeholders={
+                "url": json.loads(
+                    self._login_task.exception().args[1]
+                ).get("url", "")
+            }
         )
 
     async def async_step_login(
@@ -112,4 +131,9 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step after login has failed."""
-        return self.async_abort(reason="login_failed")
+        reason = "unknown_login_error"
+        _exc = self._login_task.exception()
+        if isinstance(_exc, TgtgLoginError):
+            if _exc.args[0] == 403:
+                return await self.async_step_captcha()
+        return self.async_abort(reason=reason)

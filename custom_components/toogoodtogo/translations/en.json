@@ -13,6 +13,9 @@
                     "item_ids": "Item IDs"
                 }
             },
+            "captcha": {
+                "description": "Additional verification is required [click here]({url}) to continue.\n\nOnce the captcha is solved, return back here and press submit."
+            },
             "finished": {
                 "description": "Login successful"
             }
@@ -20,11 +23,9 @@
         "progress": {
             "login": "Click the magic link in your mailbox on PC to continue...\n(Opening the email on mobile won't work, if you have the Too Good To Go app installed.)"
         },
-        "error": {
-            "login_failed": "Authentication failed. Check the logs for more information."
-        },
         "abort": {
-            "already_configured": "This user is already configured."
+            "already_configured": "This user is already configured.",
+            "unknown_login_error": "Authentication failed. Check the logs for more information."
         }
     }
 }
