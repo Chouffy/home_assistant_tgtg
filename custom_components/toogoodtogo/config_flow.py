@@ -134,3 +134,23 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             if _exc.args[0] == 403:
                 reason = "captcha"
         return self.async_abort(reason=reason)
+
+    async def async_step_reauth(
+        self, entry_data: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle reauthentication."""
+        errors = {}
+        if entry_data is not None:
+            self._config = entry_data
+            self._tgtg = TgtgClient(
+                email=entry_data[CONF_EMAIL],
+                access_token=entry_data[CONF_ACCESS_TOKEN],
+                refresh_token=entry_data[CONF_REFRESH_TOKEN],
+                cookie=entry_data[CONF_COOKIE]
+            )
+            return await self.async_step_login()
+        return self.async_show_form(
+            step_id="reauth",
+            data_schema=self.add_suggested_values_to_schema(LOGIN_SCHEMA, entry_data),
+            errors=errors
+        )

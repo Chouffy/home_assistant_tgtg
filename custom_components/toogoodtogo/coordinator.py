@@ -9,9 +9,10 @@ from homeassistant.const import (
     CONF_ACCESS_TOKEN
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from tgtg import TgtgClient
+from tgtg import TgtgClient, TgtgLoginError
 
 from .const import CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS
 
@@ -55,12 +56,17 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Update data."""
-        self.items = await self.hass.async_add_executor_job(self._tgtg.get_items)
-        self.item_id_set = {item["item"]["item_id"] for item in self.items}
-        for item in self.item_ids:
-            if self.has_item(item):
-                continue
-            self.items.append(await self.hass.async_add_executor_job(self._tgtg.get_item, item))
-            self.item_id_set.add(item)
-        self.tgtg_orders = await self.hass.async_add_executor_job(self._tgtg.get_active)
-        self.tgtg_orders = self.tgtg_orders["orders"]
+        try:
+            self.items = await self.hass.async_add_executor_job(self._tgtg.get_items)
+            self.item_id_set = {item["item"]["item_id"] for item in self.items}
+            for item in self.item_ids:
+                if self.has_item(item):
+                    continue
+                self.items.append(await self.hass.async_add_executor_job(self._tgtg.get_item, item))
+                self.item_id_set.add(item)
+            self.tgtg_orders = await self.hass.async_add_executor_job(self._tgtg.get_active)
+            self.tgtg_orders = self.tgtg_orders["orders"]
+            return True
+        except TgtgLoginError as err:
+            _LOGGER.error("Error during login: %s", err)
+            raise ConfigEntryAuthFailed() from err
