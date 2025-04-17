@@ -10,17 +10,18 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from tgtg import TgtgClient, TgtgLoginError
+from tgtg import TgtgClient, TgtgLoginError, TgtgAPIError
 
-from .const import CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS
+from .const import CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS, DEFAULT_SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
 class TGTGUpdateCoordinator(DataUpdateCoordinator):
     """Data update coordinator for TGTG."""
 
+    _consecutive_api_errors = 0
     _tgtg: TgtgClient = None
     items: list = None
     item_ids: list = None
@@ -33,7 +34,7 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name="TGTG Coordinator",
-            update_interval=timedelta(minutes=15),
+            update_interval=timedelta(minutes=DEFAULT_SCAN_INTERVAL),
             always_update=True
         )
         self.config_entry = entry
@@ -66,7 +67,19 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
                 self.item_id_set.add(item)
             self.tgtg_orders = await self.hass.async_add_executor_job(self._tgtg.get_active)
             self.tgtg_orders = self.tgtg_orders["orders"]
+            self._consecutive_api_errors = 0
+            self.update_interval = timedelta(minutes=DEFAULT_SCAN_INTERVAL)
             return True
         except TgtgLoginError as err:
             _LOGGER.error("Error during login: %s", err)
             raise ConfigEntryAuthFailed() from err
+        except TgtgAPIError as err:
+            self._consecutive_api_errors += 1
+            if err.args[0] == 403 and "captcha-delivery.com" in str(err.args[1]):
+                if self._consecutive_api_errors > 4:
+                    raise UpdateFailed(translation_key="too_many_requests") from err
+                _LOGGER.warning("Too many API requests, delaying updates for 1 hour.")
+                self.update_interval = timedelta(hours=1)
+                return True
+            _LOGGER.error("Error during API request: %s", err)
+            raise UpdateFailed(translation_key="api_error") from err

@@ -5,6 +5,8 @@ CONF_REFRESH_TOKEN = "refresh_token"
 CONF_COOKIE = "cookie"
 CONF_ITEM_IDS = "item_ids"
 
+DEFAULT_SCAN_INTERVAL = 60 # once an hour due to API limits
+
 ATTR_ITEM_ID = "item_id"
 ATTR_ITEM_URL = "item_url"
 ATTR_PRICE = "item_price"

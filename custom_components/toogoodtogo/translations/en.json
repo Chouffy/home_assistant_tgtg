@@ -25,5 +25,13 @@
             "already_configured": "This user is already configured.",
             "unknown_login_error": "Authentication failed. Check the logs for more information."
         }
+    },
+    "exceptions": {
+        "too_many_requests": {
+            "message": "Too many requests were made to the API. Updates have been delayed for 1 hour."
+        },
+        "api_error": {
+            "message": "An unknown error occurred. Check the logs for more information."
+        }
     }
 }
