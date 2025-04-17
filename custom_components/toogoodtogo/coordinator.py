@@ -24,6 +24,7 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
     items: list = None
     item_ids: list = None
     tgtg_orders: dict = None
+    item_id_set = set()
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry):
         """Init DUC."""
@@ -45,10 +46,7 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
 
     def has_item(self, item_id) -> bool:
         """Returns true if the item has been retrieved and is in the cache."""
-        for item in self.items:
-            if item["item"]["item_id"] == item_id:
-                return True
-        return False
+        return item_id in self.item_id_set
 
     async def _async_setup(self):
         """Setup and login."""
@@ -58,9 +56,11 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Update data."""
         self.items = await self.hass.async_add_executor_job(self._tgtg.get_items)
+        self.item_id_set = {item["item"]["item_id"] for item in self.items}
         for item in self.item_ids:
             if self.has_item(item):
                 continue
             self.items.append(await self.hass.async_add_executor_job(self._tgtg.get_item, item))
+            self.item_id_set.add(item)
         self.tgtg_orders = await self.hass.async_add_executor_job(self._tgtg.get_active)
         self.tgtg_orders = self.tgtg_orders["orders"]

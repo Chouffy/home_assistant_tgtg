@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import json
 from typing import Any
 
 import voluptuous as vol
@@ -21,6 +20,19 @@ LOGIN_SCHEMA = vol.Schema(
         vol.Required(CONF_EMAIL): selector.TextSelector(
             selector.TextSelectorConfig(
                 type=selector.TextSelectorType.EMAIL
+            )
+        )
+    }
+)
+
+ITEM_IDS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_ITEM_IDS): selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=[],
+                custom_value=True,
+                multiple=True,
+                mode=selector.SelectSelectorMode.DROPDOWN
             )
         )
     }
@@ -48,6 +60,8 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         """Initial config flow step."""
         errors = {}
         if user_input is not None:
+            await self.async_set_unique_id(user_input[CONF_EMAIL])
+            self._abort_if_unique_id_configured()
             self._config = user_input
             self._tgtg = TgtgClient(email=user_input[CONF_EMAIL])
             return await self.async_step_login()
@@ -55,22 +69,6 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=LOGIN_SCHEMA,
             errors=errors
-        )
-
-    async def async_step_captcha(
-        self, user_input: dict[str, Any] | None = None
-    ):
-        """Captcha required step."""
-        if user_input is not None:
-            self._login_task = None
-            return await self.async_step_login()
-        return self.async_show_form(
-            step_id="captcha",
-            description_placeholders={
-                "url": json.loads(
-                    self._login_task.exception().args[1]
-                ).get("url", "")
-            }
         )
 
     async def async_step_login(
@@ -87,32 +85,31 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             if err := self._login_task.exception():
                 _LOGGER.error("Unexpected error during login: %s", err)
                 return self.async_show_progress_done(next_step_id="failed")
-            return self.async_show_progress_done(next_step_id="item_ids")
+            return self.async_show_progress_done(next_step_id="login_complete")
         return self.async_show_progress(
             step_id="login",
             progress_action="login",
             progress_task=self._login_task
         )
 
+    async def async_step_login_complete(
+            self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Step after login has succeeded."""
+        return await self.async_step_item_ids()
+
     async def async_step_item_ids(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step to collect item ids."""
+        errors = {}
         if user_input is not None:
-            self._config[CONF_ITEM_IDS] = user_input[CONF_ITEM_IDS]
+            self._config[CONF_ITEM_IDS] = user_input.get(CONF_ITEM_IDS, [])
             return await self.async_step_finished()
         return self.async_show_form(
             step_id="item_ids",
-            data_schema=vol.Schema(
-                {
-                    vol.Optional(CONF_ITEM_IDS): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            custom_value=True,
-                            mode=selector.SelectSelectorMode.DROPDOWN
-                        )
-                    )
-                }
-            )
+            data_schema=ITEM_IDS_SCHEMA,
+            errors=errors
         )
 
     async def async_step_finished(
@@ -135,5 +132,5 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         _exc = self._login_task.exception()
         if isinstance(_exc, TgtgLoginError):
             if _exc.args[0] == 403:
-                return await self.async_step_captcha()
+                reason = "captcha"
         return self.async_abort(reason=reason)
