@@ -62,3 +62,10 @@ class TGTGSensor(TGTGEntity, SensorEntity):
     def native_value(self) -> int:
         """Return sensor value."""
         return self.entity_description.value_fn(self)
+
+    @property
+    def entity_picture(self) -> str | None:
+        """Return entity picture."""
+        if "logo_picture" in self.tgtg_answer["item"]:
+            return self.tgtg_answer["item"]["logo_picture"]["current_url"]
+        return None
