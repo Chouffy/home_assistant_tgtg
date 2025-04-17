@@ -17,7 +17,10 @@ from .const import (
     ATTR_PRICE,
     ATTR_SOLDOUT_TIMESTAMP,
     ATTR_TOTAL_QUANTITY_ORDERED,
-    ATTR_VALUE
+    ATTR_VALUE,
+    ATTR_PICKUP_LOCATION,
+    ATTR_PICKUP_LONGITUDE,
+    ATTR_PICKUP_LATITUDE
 )
 from .coordinator import TGTGUpdateCoordinator
 
@@ -146,4 +149,10 @@ class TGTGEntity(CoordinatorEntity[TGTGUpdateCoordinator]):
         data[ATTR_ORDERS_PLACED] = orders_placed
         if total_quantity_ordered > 0:
             data[ATTR_TOTAL_QUANTITY_ORDERED] = total_quantity_ordered
+        if ATTR_PICKUP_LOCATION in self.tgtg_answer:
+            if "location" in self.tgtg_answer[ATTR_PICKUP_LOCATION]:
+                data[ATTR_PICKUP_LONGITUDE] = self.tgtg_answer[
+                    ATTR_PICKUP_LOCATION]["location"][ATTR_PICKUP_LONGITUDE]
+                data[ATTR_PICKUP_LATITUDE] = self.tgtg_answer[
+                    ATTR_PICKUP_LOCATION]["location"][ATTR_PICKUP_LATITUDE]
         return data
