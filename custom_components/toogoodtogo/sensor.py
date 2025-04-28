@@ -15,8 +15,8 @@ from .entity import TGTGEntity
 @dataclass(frozen=True, kw_only=True)
 class TGTGEntityDescription(SensorEntityDescription):
     """TGTG Sensor Description."""
-    name_fn: Callable[[TGTGEntity], None] = lambda: None
-    value_fn: Callable[[TGTGEntity], None] = lambda: None
+    name_fn: Callable[[TGTGEntity], str] = lambda: None
+    value_fn: Callable[[TGTGEntity], int] = lambda: None
 
 ENTITY_DESCRIPTIONS = [
     TGTGEntityDescription(
