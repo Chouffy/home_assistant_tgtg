@@ -1,0 +1,25 @@
+rules:
+  # Bronze
+  action-setup:
+    status: exempt
+    comment: |
+      This integration does not use any actions.
+  appropriate-polling: done
+  brands: done
+  common-modules: done
+  entity-unique-id: done
+  has-entity-name: done
+  runtime-data: done
+  unique-config-entry: done
+
+  # Silver
+  action-exceptions:
+    status: exempt
+    comment: |
+      This integration does not use any actions.
+  integration-owner: done
+  reauthentication-flow: done
+
+  # Gold
+  devices: done
+  dynamic-devices: done

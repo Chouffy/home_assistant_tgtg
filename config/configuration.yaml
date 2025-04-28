@@ -1,0 +1,18 @@
+# https://www.home-assistant.io/integrations/default_config/
+default_config:
+
+# https://www.home-assistant.io/integrations/homeassistant/
+homeassistant:
+  debug: true
+
+# https://www.home-assistant.io/integrations/logger/
+logger:
+  default: info
+  logs:
+    custom_components.tgtg: debug
+    tgtg: debug
+
+# Enable VSCode debugging
+debugpy:
+  start: true
+  wait: true
