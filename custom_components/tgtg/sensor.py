@@ -73,8 +73,9 @@ class TGTGItemSensor(SensorEntity):
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
-        store_name = self.get_item()['store']['store_name']
-        display_name = self.get_item()['display_name']
+        item = self.get_item()  # Cache the result of get_item()
+        store_name = item['store']['store_name']
+        display_name = item['display_name']
         if display_name:
             return display_name
         if store_name:
