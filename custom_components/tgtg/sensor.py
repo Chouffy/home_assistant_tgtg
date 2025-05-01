@@ -83,7 +83,7 @@ class TGTGItemSensor(SensorEntity):
 
     @property
     def unique_id(self):
-        """Return the unique of the sensor."""
+        """Return the unique ID of the sensor."""
         return self._unique_id
 
     @property
