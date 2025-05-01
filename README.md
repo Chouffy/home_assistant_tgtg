@@ -35,7 +35,7 @@ This is to be executed outside of Home Assistant, i.e. on your local machine.
 
 1. Install required packages.
    - [Python >=3.8](https://www.python.org/downloads/)
-   - [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg==0.18.2` or `pip install --upgrade tgtg` if you already have it.
+   - [tgtg-python](https://github.com/ahivert/tgtg-python) library: In a command line, type `pip install tgtg==0.18.3` or `pip install --upgrade tgtg` if you already have it.
 1. Run the [tgtg_get_tokens](./tgtg_get_tokens.py) script to get access and refresh token. Save these for later.
 
 #### 1b. Docker
