@@ -91,12 +91,12 @@ class Client:
             # update item more often if item is in saleswindow
             if self.is_during_sales_window(self.items[item_id], 10):
                 LOGGER.debug('Updating item details because in saleswindow...')
-                self.update_item_details(item_id)
-                time.sleep(0.5) # sleep for 500ms to not flood tgtg api
+                await self.update_item_details(item_id)
+                await asyncio.sleep(0.5) # sleep for 500ms to not flood tgtg api
             # fetch item in detail to get more data (but not so often) = 40 * DEFAULT_SCAN_INTERVAL
             elif self.updateCycle is None or self.updateCycle >= 40:
                 await self.update_item_details(item_id)
-                time.sleep(0.5) # sleep for 500ms to not flood tgtg api
+                await asyncio.sleep(0.5) # sleep for 500ms to not flood tgtg api
 
         # reset updateCycle
         if self.updateCycle is None or self.updateCycle >= 40:
