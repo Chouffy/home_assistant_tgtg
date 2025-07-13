@@ -78,7 +78,7 @@ def setup_platform(
         for each_item_id in item:
             add_entities([TGTGSensor(each_item_id)])
     else:
-        tgtgReply = tgtg_client.get_items()
+        tgtgReply = tgtg_client.get_items(page_size=200)
         for item in tgtgReply:
             add_entities([TGTGSensor(item["item"]["item_id"])])
 
