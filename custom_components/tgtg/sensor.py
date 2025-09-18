@@ -214,7 +214,7 @@ class TGTGSensor(SensorEntity):
         """
         global tgtg_client
         self.tgtg_answer = tgtg_client.get_item(item_id=self.item_id)
-        time.sleep(2)
+        time.sleep(1)
         self.tgtg_orders = tgtg_client.get_active()["orders"]
 
         self.store_name = self.tgtg_answer["display_name"]
