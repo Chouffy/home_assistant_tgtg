@@ -154,3 +154,31 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             data_schema=self.add_suggested_values_to_schema(LOGIN_SCHEMA, entry_data),
             errors=errors
         )
+
+    async def async_step_import(
+        self, import_data: dict[str, Any]
+    ) -> ConfigFlowResult:
+        """Import configuration from YAML."""
+        _LOGGER.info("Importing TGTG configuration from YAML")
+
+        # Email is required for import
+        if CONF_EMAIL not in import_data or not import_data[CONF_EMAIL]:
+            _LOGGER.error("Cannot import YAML config without email")
+            return self.async_abort(reason="import_missing_email")
+
+        # Check if already configured
+        await self.async_set_unique_id(import_data[CONF_EMAIL])
+        self._abort_if_unique_id_configured()
+
+        # Create config entry with imported data
+        # Token validation is skipped - if expired, reauth flow will handle it
+        return self.async_create_entry(
+            title=f"{import_data[CONF_EMAIL]} (imported)",
+            data={
+                CONF_EMAIL: import_data[CONF_EMAIL],
+                CONF_ACCESS_TOKEN: import_data[CONF_ACCESS_TOKEN],
+                CONF_REFRESH_TOKEN: import_data[CONF_REFRESH_TOKEN],
+                CONF_COOKIE: import_data[CONF_COOKIE],
+                CONF_ITEM_IDS: import_data.get(CONF_ITEM_IDS, []),
+            },
+        )

@@ -3,20 +3,61 @@
 from collections.abc import Callable
 from dataclasses import dataclass
 
+import voluptuous as vol
+
 from homeassistant.components.sensor import (
+    PLATFORM_SCHEMA as SENSOR_PLATFORM_SCHEMA,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
 )
+from homeassistant.config_entries import SOURCE_IMPORT
+from homeassistant.const import CONF_ACCESS_TOKEN, CONF_EMAIL
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 
+from .const import CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS, DOMAIN
 from .coordinator import TGTGUpdateCoordinator
 from .entity import TGTGEntity
+
+# YAML schema for import (deprecated)
+CONF_ITEM = "item"
+PLATFORM_SCHEMA = SENSOR_PLATFORM_SCHEMA.extend(
+    {
+        vol.Required(CONF_ACCESS_TOKEN): cv.string,
+        vol.Required(CONF_REFRESH_TOKEN): cv.string,
+        vol.Required(CONF_COOKIE): cv.string,
+        vol.Optional("user_id"): cv.string,
+        vol.Optional(CONF_EMAIL): vol.Email(),
+        vol.Optional(CONF_ITEM, default=""): cv.ensure_list,
+    }
+)
+
+
+async def async_setup_platform(hass: HomeAssistant, config, async_add_entities, discovery_info=None):
+    """Import YAML config to config entry."""
+    item_ids = [str(i) for i in config.get(CONF_ITEM, []) if i]
+    hass.async_create_task(
+        hass.config_entries.flow.async_init(
+            DOMAIN,
+            context={"source": SOURCE_IMPORT},
+            data={
+                CONF_EMAIL: config.get(CONF_EMAIL),
+                CONF_ACCESS_TOKEN: config[CONF_ACCESS_TOKEN],
+                CONF_REFRESH_TOKEN: config[CONF_REFRESH_TOKEN],
+                CONF_COOKIE: config[CONF_COOKIE],
+                CONF_ITEM_IDS: item_ids,
+            },
+        )
+    )
+
 
 @dataclass(frozen=True, kw_only=True)
 class TGTGEntityDescription(SensorEntityDescription):
     """TGTG Sensor Description."""
     name_fn: Callable[[TGTGEntity], str] = lambda: None
     value_fn: Callable[[TGTGEntity], int] = lambda: None
+
 
 ENTITY_DESCRIPTIONS = [
     TGTGEntityDescription(
@@ -30,8 +71,9 @@ ENTITY_DESCRIPTIONS = [
     )
 ]
 
+
 async def async_setup_entry(hass, config_entry, async_add_entities) -> None:
-    """Setup the sensor platform."""
+    """Setup the sensor platform from config entry."""
     coordinator: TGTGUpdateCoordinator = config_entry.runtime_data
     if not isinstance(coordinator, TGTGUpdateCoordinator):
         return

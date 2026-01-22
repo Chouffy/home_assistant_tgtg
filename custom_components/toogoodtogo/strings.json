@@ -23,7 +23,8 @@
         "abort": {
             "captcha": "Additional verification is required. Try again later.",
             "already_configured": "This user is already configured.",
-            "unknown_login_error": "Authentication failed. Check the logs for more information."
+            "unknown_login_error": "Authentication failed. Check the logs for more information.",
+            "import_missing_email": "YAML import failed - email is required. Please add email to your YAML config or set up the integration manually."
         }
     },
     "exceptions": {

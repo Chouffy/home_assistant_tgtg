@@ -113,10 +113,14 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
             for item_id in self.item_ids:
                 if self.has_item(item_id):
                     continue
-                self.items.append(
-                    await self.hass.async_add_executor_job(self._tgtg.get_item, item_id)
-                )
-                self.item_id_set.add(item_id)
+                try:
+                    item = await self.hass.async_add_executor_job(
+                        self._tgtg.get_item, item_id
+                    )
+                    self.items.append(item)
+                    self.item_id_set.add(item_id)
+                except TgtgAPIError as err:
+                    _LOGGER.warning("Failed to fetch item %s: %s", item_id, err)
                 await asyncio.sleep(API_RATE_LIMIT_DELAY)
 
             # Fetch active orders

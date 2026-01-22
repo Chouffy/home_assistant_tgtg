@@ -23,7 +23,8 @@
         "abort": {
             "captcha": "Zusätzliche Verifizierung erforderlich. Versuche es später erneut.",
             "already_configured": "Dieser Benutzer ist bereits konfiguriert.",
-            "unknown_login_error": "Authentifizierung fehlgeschlagen. Überprüfe die Protokolle für weitere Informationen."
+            "unknown_login_error": "Authentifizierung fehlgeschlagen. Überprüfe die Protokolle für weitere Informationen.",
+            "import_missing_email": "YAML-Import fehlgeschlagen - E-Mail ist erforderlich. Bitte füge eine E-Mail zu deiner YAML-Konfiguration hinzu oder richte die Integration manuell ein."
         }
     },
     "exceptions": {
