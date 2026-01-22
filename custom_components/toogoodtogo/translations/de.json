@@ -1,0 +1,37 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "description": "Richte dein Too Good To Go Konto ein",
+                "data": {
+                    "email": "E-Mail"
+                }
+            },
+            "item_ids": {
+                "description": "Optionale Artikel-IDs zum Sammeln\n\nStandardmäßig sammelt diese Integration nur Favoriten aus der App. Wenn du andere Artikel sehen möchtest, füge sie hier hinzu.",
+                "data": {
+                    "item_ids": "Artikel-IDs"
+                }
+            },
+            "finished": {
+                "description": "Anmeldung erfolgreich"
+            }
+        },
+        "progress": {
+            "login": "Klicke auf den Magic-Link in deinem Postfach am PC, um fortzufahren...\n(Das Öffnen der E-Mail auf dem Handy funktioniert nicht, wenn die Too Good To Go App installiert ist.)"
+        },
+        "abort": {
+            "captcha": "Zusätzliche Verifizierung erforderlich. Versuche es später erneut.",
+            "already_configured": "Dieser Benutzer ist bereits konfiguriert.",
+            "unknown_login_error": "Authentifizierung fehlgeschlagen. Überprüfe die Protokolle für weitere Informationen."
+        }
+    },
+    "exceptions": {
+        "too_many_requests": {
+            "message": "Zu viele Anfragen an die API. Updates wurden um 1 Stunde verzögert."
+        },
+        "api_error": {
+            "message": "Ein unbekannter Fehler ist aufgetreten. Überprüfe die Protokolle für weitere Informationen."
+        }
+    }
+}

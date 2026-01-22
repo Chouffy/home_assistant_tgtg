@@ -1,6 +1,8 @@
 """Update coordinator for tgtg."""
 
-from datetime import timedelta
+import asyncio
+from datetime import datetime, timedelta, timezone
+from functools import partial
 import logging
 
 from homeassistant.config_entries import ConfigEntry
@@ -17,6 +19,12 @@ from tgtg import TgtgClient, TgtgLoginError, TgtgAPIError
 from .const import CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS, DEFAULT_SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
+
+# Rate limiting delay between API calls (in seconds)
+API_RATE_LIMIT_DELAY = 1.0
+
+# Minutes after sales window start to use frequent polling
+SALES_WINDOW_POLLING_MINUTES = 10
 
 class TGTGUpdateCoordinator(DataUpdateCoordinator):
     """Data update coordinator for TGTG."""
@@ -55,20 +63,77 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
         await self.hass.async_add_executor_job(self._tgtg.login)
         return await super()._async_setup()
 
+    async def _fetch_all_favorites(self) -> list:
+        """Fetch ALL pages of favorites, not just the first page."""
+        all_items = []
+        page = 1
+        while True:
+            _LOGGER.debug("Fetching favorites page %d", page)
+            items = await self.hass.async_add_executor_job(
+                partial(self._tgtg.get_items, page=page)
+            )
+            if not items:
+                break
+            all_items.extend(items)
+            page += 1
+            # Rate limiting between page fetches
+            await asyncio.sleep(API_RATE_LIMIT_DELAY)
+        _LOGGER.info("Fetched %d total favorites across %d pages", len(all_items), page - 1)
+        return all_items
+
+    def _is_during_sales_window(self, item: dict) -> bool:
+        """Check if item is currently in its sales window."""
+        if "next_sales_window_purchase_start" not in item:
+            return False
+
+        try:
+            current_time = datetime.now(timezone.utc)
+            sales_window_str = item["next_sales_window_purchase_start"]
+            sales_window = datetime.fromisoformat(sales_window_str.replace("Z", "+00:00"))
+            window_end = sales_window + timedelta(minutes=SALES_WINDOW_POLLING_MINUTES)
+            return sales_window <= current_time <= window_end
+        except (ValueError, TypeError) as err:
+            _LOGGER.debug("Error parsing sales window: %s", err)
+            return False
+
+    def _any_item_in_sales_window(self) -> bool:
+        """Check if any item is currently in its sales window."""
+        if not self.items:
+            return False
+        return any(self._is_during_sales_window(item) for item in self.items)
+
     async def _async_update_data(self):
         """Update data."""
         try:
-            self.items = await self.hass.async_add_executor_job(self._tgtg.get_items)
+            # Fetch all favorites with pagination
+            self.items = await self._fetch_all_favorites()
             self.item_id_set = {item["item"]["item_id"] for item in self.items}
-            for item in self.item_ids:
-                if self.has_item(item):
+
+            # Fetch any additional configured item IDs not in favorites
+            for item_id in self.item_ids:
+                if self.has_item(item_id):
                     continue
-                self.items.append(await self.hass.async_add_executor_job(self._tgtg.get_item, item))
-                self.item_id_set.add(item)
+                self.items.append(
+                    await self.hass.async_add_executor_job(self._tgtg.get_item, item_id)
+                )
+                self.item_id_set.add(item_id)
+                await asyncio.sleep(API_RATE_LIMIT_DELAY)
+
+            # Fetch active orders
+            await asyncio.sleep(API_RATE_LIMIT_DELAY)
             self.tgtg_orders = await self.hass.async_add_executor_job(self._tgtg.get_active)
             self.tgtg_orders = self.tgtg_orders["orders"]
+
+            # Reset error counter on success
             self._consecutive_api_errors = 0
-            self.update_interval = timedelta(minutes=DEFAULT_SCAN_INTERVAL)
+
+            # Smart polling: more frequent updates during sales windows
+            if self._any_item_in_sales_window():
+                self.update_interval = timedelta(minutes=3)
+                _LOGGER.debug("Item in sales window, using 3-minute polling interval")
+            else:
+                self.update_interval = timedelta(minutes=DEFAULT_SCAN_INTERVAL)
+
             return True
         except TgtgLoginError as err:
             _LOGGER.error("Error during login: %s", err)
