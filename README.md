@@ -9,7 +9,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 - **Config Flow** - Full UI-based configuration
 - **Automatic favorites** - Retrieves all your favorites from the TGTG app (with pagination for accounts with 20+ favorites)
 - **Smart polling** - More frequent updates (every 3 minutes) during sales windows when items are likely to become available
-- **API rate limiting** - Built-in 500ms delays between API calls to prevent rate limiting issues
+- **API rate limiting** - Built-in 1 second delays between API calls to prevent rate limiting issues
 - **Reauth support** - Handles token expiration gracefully
 - **Diagnostics** - Built-in diagnostics support for troubleshooting
 - **Custom item IDs** - Optionally add non-favorite items during setup
@@ -55,7 +55,7 @@ During setup, you can optionally add item IDs for stores that aren't in your fav
 
 - **Default polling**: Every 60 minutes
 - **Sales window polling**: Every 3 minutes when any item is within its sales window
-- **Rate limited**: 500ms delay between API calls to prevent being blocked
+- **Rate limited**: 1 second delay between API calls to prevent being blocked
 - **Adaptive**: If API rate limits are hit, polling is automatically reduced to once per hour
 
 > **Note**: Each time you add/remove a favorite in the TGTG app, **reload the integration** for changes to take effect.
