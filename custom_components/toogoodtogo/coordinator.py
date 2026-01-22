@@ -144,7 +144,7 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
             raise ConfigEntryAuthFailed() from err
         except TgtgAPIError as err:
             self._consecutive_api_errors += 1
-            if err.args[0] == 403 and "captcha-delivery.com" in str(err.args[1]):
+            if err.args[0] == 403 and "://captcha-delivery.com" in str(err.args[1]):
                 if self._consecutive_api_errors > 4:
                     raise UpdateFailed(translation_key="too_many_requests") from err
                 _LOGGER.warning("Too many API requests, delaying updates for 1 hour.")

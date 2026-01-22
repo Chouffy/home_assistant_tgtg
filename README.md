@@ -60,6 +60,33 @@ During setup, you can optionally add item IDs for stores that aren't in your fav
 
 > **Note**: Each time you add/remove a favorite in the TGTG app, **reload the integration** for changes to take effect.
 
+## Automation example
+
+Here's an example automation that sends a notification when a TGTG item becomes available:
+
+```yaml
+automation:
+  - alias: "TGTG Item Available"
+    trigger:
+      - platform: state
+        entity_id: sensor.tgtg_your_store_name
+    condition:
+      - condition: template
+        value_template: "{{ trigger.to_state.state | int > 0 }}"
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "TGTG Surprise Bag Available!"
+          message: >
+            {{ trigger.to_state.attributes.friendly_name }} has {{ trigger.to_state.state }} bag(s) available!
+            Pickup: {{ trigger.to_state.attributes.pickup_start | as_datetime | as_local }}
+            Price: {{ trigger.to_state.attributes.item_price }}
+          data:
+            url: "{{ trigger.to_state.attributes.item_url }}"
+```
+
+> **Note**: All attributes use snake_case (underscores), e.g., `pickup_start`, `item_price`, `item_url`.
+
 ## Dashboard card example
 
 Here is an example for a card on your Home Assistant dashboard created by @wallieboy, updated by @Sarnog in https://github.com/Chouffy/home_assistant_tgtg/issues/73 and @tjorim. Support for images was later added by @ov3rk1ll in https://github.com/Chouffy/home_assistant_tgtg/pull/139.
