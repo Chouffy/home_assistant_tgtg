@@ -140,6 +140,17 @@ Your tokens may have expired. Go to **Settings** → **Devices & Services**, fin
 
 If you have more than 20 favorites, make sure you're using version 6.0.0 or later which includes pagination support.
 
+### Enable debug logging
+
+Add this to your `configuration.yaml` and restart Home Assistant:
+
+```yaml
+logger:
+  default: info
+  logs:
+    custom_components.tgtg: debug
+```
+
 ## Breaking changes in v6.0.0
 
 - **Config flow only**: YAML configuration is deprecated. Existing YAML configs will be automatically migrated to UI-based configuration on first load. You can then remove the YAML config from your configuration.yaml.
