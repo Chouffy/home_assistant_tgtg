@@ -27,15 +27,15 @@ This is a **config flow integration** using modern Home Assistant patterns (2025
 
 ### Key Files
 
-- `custom_components/toogoodtogo/__init__.py` - Entry point: sets up coordinator and forwards to platforms
-- `custom_components/toogoodtogo/config_flow.py` - UI-based configuration with email magic link authentication
-- `custom_components/toogoodtogo/coordinator.py` - Data update coordinator with pagination, rate limiting, and smart polling
-- `custom_components/toogoodtogo/entity.py` - Base entity class extending CoordinatorEntity
-- `custom_components/toogoodtogo/sensor.py` - Sensor platform using SensorEntityDescription pattern
-- `custom_components/toogoodtogo/diagnostics.py` - Diagnostics support with sensitive field redaction
-- `custom_components/toogoodtogo/manifest.json` - Component metadata and tgtg library dependency
-- `custom_components/toogoodtogo/strings.json` - Translation strings (English)
-- `custom_components/toogoodtogo/translations/` - Localized translations (en, de)
+- `custom_components/tgtg/__init__.py` - Entry point: sets up coordinator and forwards to platforms
+- `custom_components/tgtg/config_flow.py` - UI-based configuration with email magic link authentication
+- `custom_components/tgtg/coordinator.py` - Data update coordinator with pagination, rate limiting, and smart polling
+- `custom_components/tgtg/entity.py` - Base entity class extending CoordinatorEntity
+- `custom_components/tgtg/sensor.py` - Sensor platform using SensorEntityDescription pattern
+- `custom_components/tgtg/diagnostics.py` - Diagnostics support with sensitive field redaction
+- `custom_components/tgtg/manifest.json` - Component metadata and tgtg library dependency
+- `custom_components/tgtg/strings.json` - Translation strings (English)
+- `custom_components/tgtg/translations/` - Localized translations (en, de)
 
 ### Design Pattern
 
@@ -48,9 +48,9 @@ This is a **config flow integration** using modern Home Assistant patterns (2025
 
 ### Polling Strategy
 
-- Default: 15-minute polling interval
+- Default: 60-minute polling interval
 - Smart polling: 3-minute interval during sales windows (when items are likely available)
-- API rate limiting: 500ms delay between API calls
+- API rate limiting: 1 second delay between API calls
 - Adaptive: 1-hour delay on captcha/rate limit errors
 - Pagination: Fetches ALL favorites pages (not just first 20)
 

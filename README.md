@@ -142,5 +142,4 @@ If you have more than 20 favorites, make sure you're using version 6.0.0 or late
 
 ## Breaking changes in v6.0.0
 
-- **New folder structure**: The integration folder has changed from `tgtg/` to `toogoodtogo/`. If upgrading from an older version, you may need to remove the old integration folder manually.
-- **Config flow only**: YAML configuration is no longer supported. Migrate to UI-based configuration.
+- **Config flow only**: YAML configuration is deprecated. Existing YAML configs will be automatically migrated to UI-based configuration on first load. You can then remove the YAML config from your configuration.yaml.
