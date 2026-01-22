@@ -60,7 +60,11 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_setup(self):
         """Setup and login."""
-        await self.hass.async_add_executor_job(self._tgtg.login)
+        try:
+            await self.hass.async_add_executor_job(self._tgtg.login)
+        except (TgtgLoginError, TgtgAPIError) as err:
+            _LOGGER.error("Login failed, triggering reauth: %s", err)
+            raise ConfigEntryAuthFailed("Login failed, reauthentication required") from err
         return await super()._async_setup()
 
     async def _fetch_all_favorites(self) -> list:
@@ -123,10 +127,14 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
                     _LOGGER.warning("Failed to fetch item %s: %s", item_id, err)
                 await asyncio.sleep(API_RATE_LIMIT_DELAY)
 
-            # Fetch active orders
+            # Fetch active orders (non-critical, don't fail if this errors)
             await asyncio.sleep(API_RATE_LIMIT_DELAY)
-            self.tgtg_orders = await self.hass.async_add_executor_job(self._tgtg.get_active)
-            self.tgtg_orders = self.tgtg_orders["orders"]
+            try:
+                orders_response = await self.hass.async_add_executor_job(self._tgtg.get_active)
+                self.tgtg_orders = orders_response.get("orders", [])
+            except TgtgAPIError as err:
+                _LOGGER.warning("Failed to fetch orders: %s", err)
+                self.tgtg_orders = []
 
             # Reset error counter on success
             self._consecutive_api_errors = 0
