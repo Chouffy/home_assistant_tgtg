@@ -73,7 +73,19 @@ GitHub Actions run on push/PR:
 - **HACS validation** - Community Store compatibility
 - **CodeQL** - Security analysis
 
+### Error Handling
+
+- Login errors (`TgtgLoginError`) trigger reauth flow
+- API errors (`TgtgAPIError`) during updates: captcha/rate-limit backs off 1 hour, others fail update
+- Orders fetch is non-critical: if `get_active()` fails, items still work
+- Extra item IDs: individual failures logged as warnings, others continue
+
+### Manual Updates
+
+Users can trigger manual updates via `homeassistant.update_entity` service in automations.
+
 ## Known Limitations
 
 - Favorites list only updated when integration reloads (requires reload when adding/removing favorites in TGTG app)
 - Token refresh handled via reauth flow when tokens expire
+- YAML configuration is deprecated; existing configs auto-migrate to config entries on first load
