@@ -62,9 +62,13 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
         """Setup and login."""
         try:
             await self.hass.async_add_executor_job(self._tgtg.login)
-        except (TgtgLoginError, TgtgAPIError) as err:
+        except TgtgLoginError as err:
             _LOGGER.error("Login failed, triggering reauth: %s", err)
             raise ConfigEntryAuthFailed("Login failed, reauthentication required") from err
+        except TgtgAPIError as err:
+            # Don't trigger reauth for transient API errors (captcha/rate-limit)
+            _LOGGER.error("API error during login: %s", err)
+            raise
         return await super()._async_setup()
 
     async def _fetch_all_favorites(self) -> list:
