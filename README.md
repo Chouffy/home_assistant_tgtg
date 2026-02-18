@@ -1,7 +1,7 @@
 # Too Good To Go integration for Home Assistant
 
 > [!IMPORTANT]
-> This integration is currently not functional because of #187\
+> This integration is currently not functional because of https://github.com/Chouffy/home_assistant_tgtg/issues/187 \
 > This is out of our control, keep an eye on the upstream library\
 > https://github.com/ahivert/tgtg-python
 
