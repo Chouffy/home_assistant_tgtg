@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 > This integration is currently not functional because of https://github.com/Chouffy/home_assistant_tgtg/issues/187 \
-> This is out of our control, keep an eye on the upstream library\
+> Unfortunately this is out of our control, keep an eye on the upstream library \
 > https://github.com/ahivert/tgtg-python
 
 This aims to show the stock of one or multiple [Too Good To Go](https://toogoodtogo.com/) items using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.
