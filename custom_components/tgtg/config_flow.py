@@ -70,7 +70,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     def _tgtg_post(self, endpoint: str, **kwargs):
         """Post to the TGTG API using the client's configured session."""
         if hasattr(self._tgtg, "_post"):
-            return self._tgtg._post(endpoint, **kwargs)
+            return self._tgtg._post(self._tgtg._get_url(endpoint), **kwargs)
         return self._tgtg.session.post(
             self._tgtg._get_url(endpoint),
             headers=self._tgtg._headers,
