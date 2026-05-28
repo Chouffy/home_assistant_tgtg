@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from typing import Any
+from unittest.mock import patch
 
 import voluptuous as vol
 from homeassistant.helpers import selector
@@ -18,9 +19,7 @@ _LOGGER = logging.getLogger(__name__)
 LOGIN_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_EMAIL): selector.TextSelector(
-            selector.TextSelectorConfig(
-                type=selector.TextSelectorType.EMAIL
-            )
+            selector.TextSelectorConfig(type=selector.TextSelectorType.EMAIL)
         )
     }
 )
@@ -32,31 +31,38 @@ ITEM_IDS_SCHEMA = vol.Schema(
                 options=[],
                 custom_value=True,
                 multiple=True,
-                mode=selector.SelectSelectorMode.DROPDOWN
+                mode=selector.SelectSelectorMode.DROPDOWN,
             )
         )
     }
 )
 
+
 class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     """Represent a TGTG config flow."""
+
     VERSION = 1
     MINOR_VERSION = 0
     _config = {}
     _login_task = None
     _tgtg = None
 
+    def _tgtg_login_without_stdin_prompt(self):
+        """Run login without trying to read stdin for a PIN code."""
+        with patch("builtins.input", return_value=""):
+            self._tgtg.login()
+
     async def _tgtg_login(self):
         """Handled in the background to check the login status."""
         while True:
-            await self.hass.async_add_executor_job(self._tgtg.login)
+            await self.hass.async_add_executor_job(
+                self._tgtg_login_without_stdin_prompt
+            )
             if self._tgtg.access_token is not None:
                 break
-            await asyncio.sleep(5) # attempt to prevent captcha
+            await asyncio.sleep(5)  # attempt to prevent captcha
 
-    async def async_step_user(
-            self, user_input: dict[str, Any] | None = None
-    ):
+    async def async_step_user(self, user_input: dict[str, Any] | None = None):
         """Initial config flow step."""
         errors = {}
         if user_input is not None:
@@ -66,20 +72,15 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             self._tgtg = TgtgClient(email=user_input[CONF_EMAIL])
             return await self.async_step_login()
         return self.async_show_form(
-            step_id="user",
-            data_schema=LOGIN_SCHEMA,
-            errors=errors
+            step_id="user", data_schema=LOGIN_SCHEMA, errors=errors
         )
 
-    async def async_step_login(
-            self, user_input: dict[str, Any] | None = None
-    ):
+    async def async_step_login(self, user_input: dict[str, Any] | None = None):
         """User login step."""
         if self._login_task is None:
             ## Start login check sequence
             self._login_task = self.hass.async_create_background_task(
-                self._tgtg_login(),
-                f"Logging into account {self._config[CONF_EMAIL]}"
+                self._tgtg_login(), f"Logging into account {self._config[CONF_EMAIL]}"
             )
         if self._login_task.done():
             if err := self._login_task.exception():
@@ -87,13 +88,11 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 return self.async_show_progress_done(next_step_id="failed")
             return self.async_show_progress_done(next_step_id="login_complete")
         return self.async_show_progress(
-            step_id="login",
-            progress_action="login",
-            progress_task=self._login_task
+            step_id="login", progress_action="login", progress_task=self._login_task
         )
 
     async def async_step_login_complete(
-            self, user_input: dict[str, Any] | None = None
+        self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step after login has succeeded."""
         return await self.async_step_item_ids()
@@ -107,9 +106,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             self._config[CONF_ITEM_IDS] = user_input.get(CONF_ITEM_IDS, [])
             return await self.async_step_finished()
         return self.async_show_form(
-            step_id="item_ids",
-            data_schema=ITEM_IDS_SCHEMA,
-            errors=errors
+            step_id="item_ids", data_schema=ITEM_IDS_SCHEMA, errors=errors
         )
 
     async def async_step_finished(
@@ -146,18 +143,16 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 email=entry_data[CONF_EMAIL],
                 access_token=entry_data[CONF_ACCESS_TOKEN],
                 refresh_token=entry_data[CONF_REFRESH_TOKEN],
-                cookie=entry_data[CONF_COOKIE]
+                cookie=entry_data[CONF_COOKIE],
             )
             return await self.async_step_login()
         return self.async_show_form(
             step_id="reauth",
             data_schema=self.add_suggested_values_to_schema(LOGIN_SCHEMA, entry_data),
-            errors=errors
+            errors=errors,
         )
 
-    async def async_step_import(
-        self, import_data: dict[str, Any]
-    ) -> ConfigFlowResult:
+    async def async_step_import(self, import_data: dict[str, Any]) -> ConfigFlowResult:
         """Import configuration from YAML."""
         _LOGGER.info("Importing TGTG configuration from YAML")
 
