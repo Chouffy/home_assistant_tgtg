@@ -1,7 +1,8 @@
 """Too Good To Go config flow."""
 
-import asyncio
+import datetime
 import logging
+from http import HTTPStatus
 from typing import Any
 
 import voluptuous as vol
@@ -9,7 +10,14 @@ from homeassistant.helpers import selector
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_EMAIL, CONF_ACCESS_TOKEN
 
-from tgtg import TgtgClient, TgtgLoginError
+from tgtg import (
+    AUTH_BY_EMAIL_ENDPOINT,
+    AUTH_BY_REQUEST_PIN_ENDPOINT,
+    TgtgAPIError,
+    TgtgClient,
+    TgtgLoginError,
+    TgtgPollingError,
+)
 
 from .const import DOMAIN, CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS
 
@@ -18,9 +26,7 @@ _LOGGER = logging.getLogger(__name__)
 LOGIN_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_EMAIL): selector.TextSelector(
-            selector.TextSelectorConfig(
-                type=selector.TextSelectorType.EMAIL
-            )
+            selector.TextSelectorConfig(type=selector.TextSelectorType.EMAIL)
         )
     }
 )
@@ -32,31 +38,106 @@ ITEM_IDS_SCHEMA = vol.Schema(
                 options=[],
                 custom_value=True,
                 multiple=True,
-                mode=selector.SelectSelectorMode.DROPDOWN
+                mode=selector.SelectSelectorMode.DROPDOWN,
             )
         )
     }
 )
 
+PIN_SCHEMA = vol.Schema(
+    {
+        vol.Required("pin"): selector.TextSelector(
+            selector.TextSelectorConfig(type=selector.TextSelectorType.TEXT)
+        )
+    }
+)
+
+
 class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     """Represent a TGTG config flow."""
+
     VERSION = 1
     MINOR_VERSION = 0
-    _config = {}
-    _login_task = None
-    _tgtg = None
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._config: dict[str, Any] = {}
+        self._login_task = None
+        self._polling_id: str | None = None
+        self._tgtg: TgtgClient | None = None
+
+    def _tgtg_post(self, endpoint: str, **kwargs):
+        """Post to the TGTG API using the client's configured session."""
+        if hasattr(self._tgtg, "_post"):
+            return self._tgtg._post(self._tgtg._get_url(endpoint), **kwargs)
+        return self._tgtg.session.post(
+            self._tgtg._get_url(endpoint),
+            headers=self._tgtg._headers,
+            proxies=self._tgtg.proxies,
+            timeout=self._tgtg.timeout,
+            **kwargs,
+        )
+
+    def _tgtg_request_login(self) -> str | None:
+        """Request login without using tgtg-python's interactive prompt."""
+        if self._tgtg._already_logged:
+            self._tgtg.login()
+            return None
+
+        response = self._tgtg_post(
+            AUTH_BY_EMAIL_ENDPOINT,
+            json={
+                "device_type": self._tgtg.device_type,
+                "email": self._tgtg.email,
+            },
+        )
+        if response.status_code == HTTPStatus.OK:
+            first_login_response = response.json()
+            if first_login_response["state"] == "TERMS":
+                raise TgtgPollingError(
+                    f"This email {self._tgtg.email} is not linked to a tgtg account. "
+                    "Please signup with this email first."
+                )
+            if first_login_response["state"] == "WAIT":
+                return first_login_response["polling_id"]
+            raise TgtgLoginError(response.status_code, response.content)
+        if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            raise TgtgAPIError(
+                response.status_code, "Too many requests. Try again later."
+            )
+        raise TgtgLoginError(response.status_code, response.content)
+
+    def _tgtg_auth_by_request_pin(self, polling_id: str, pin: str) -> None:
+        """Complete login using the PIN sent by TGTG."""
+        response = self._tgtg_post(
+            AUTH_BY_REQUEST_PIN_ENDPOINT,
+            json={
+                "device_type": self._tgtg.device_type,
+                "email": self._tgtg.email,
+                "request_pin": pin,
+                "request_polling_id": polling_id,
+            },
+        )
+        if response.status_code == HTTPStatus.OK:
+            login_response = response.json()
+            self._tgtg.access_token = login_response["access_token"]
+            self._tgtg.refresh_token = login_response["refresh_token"]
+            self._tgtg.last_time_token_refreshed = datetime.datetime.now()
+            self._tgtg.cookie = response.headers.get("Set-Cookie")
+            return
+        if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            raise TgtgAPIError(
+                response.status_code, "Too many requests. Try again later."
+            )
+        raise TgtgLoginError(response.status_code, response.content)
 
     async def _tgtg_login(self):
         """Handled in the background to check the login status."""
-        while True:
-            await self.hass.async_add_executor_job(self._tgtg.login)
-            if self._tgtg.access_token is not None:
-                break
-            await asyncio.sleep(5) # attempt to prevent captcha
+        self._polling_id = await self.hass.async_add_executor_job(
+            self._tgtg_request_login
+        )
 
-    async def async_step_user(
-            self, user_input: dict[str, Any] | None = None
-    ):
+    async def async_step_user(self, user_input: dict[str, Any] | None = None):
         """Initial config flow step."""
         errors = {}
         if user_input is not None:
@@ -66,34 +147,49 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             self._tgtg = TgtgClient(email=user_input[CONF_EMAIL])
             return await self.async_step_login()
         return self.async_show_form(
-            step_id="user",
-            data_schema=LOGIN_SCHEMA,
-            errors=errors
+            step_id="user", data_schema=LOGIN_SCHEMA, errors=errors
         )
 
-    async def async_step_login(
-            self, user_input: dict[str, Any] | None = None
-    ):
+    async def async_step_login(self, user_input: dict[str, Any] | None = None):
         """User login step."""
         if self._login_task is None:
             ## Start login check sequence
             self._login_task = self.hass.async_create_background_task(
-                self._tgtg_login(),
-                f"Logging into account {self._config[CONF_EMAIL]}"
+                self._tgtg_login(), f"Logging into account {self._config[CONF_EMAIL]}"
             )
         if self._login_task.done():
             if err := self._login_task.exception():
                 _LOGGER.error("Unexpected error during login: %s", err)
                 return self.async_show_progress_done(next_step_id="failed")
+            if self._polling_id is not None:
+                return self.async_show_progress_done(next_step_id="pin")
             return self.async_show_progress_done(next_step_id="login_complete")
         return self.async_show_progress(
-            step_id="login",
-            progress_action="login",
-            progress_task=self._login_task
+            step_id="login", progress_action="login", progress_task=self._login_task
         )
 
+    async def async_step_pin(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Collect the login PIN sent by TGTG."""
+        if user_input is not None:
+            try:
+                await self.hass.async_add_executor_job(
+                    self._tgtg_auth_by_request_pin,
+                    self._polling_id,
+                    user_input["pin"],
+                )
+            except (TgtgAPIError, TgtgLoginError) as err:
+                _LOGGER.error("Unexpected error during PIN login: %s", err)
+                self._login_task = None
+                self._polling_id = None
+                return await self.async_step_login()
+            else:
+                return await self.async_step_login_complete()
+        return self.async_show_form(step_id="pin", data_schema=PIN_SCHEMA, errors={})
+
     async def async_step_login_complete(
-            self, user_input: dict[str, Any] | None = None
+        self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Step after login has succeeded."""
         return await self.async_step_item_ids()
@@ -107,9 +203,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             self._config[CONF_ITEM_IDS] = user_input.get(CONF_ITEM_IDS, [])
             return await self.async_step_finished()
         return self.async_show_form(
-            step_id="item_ids",
-            data_schema=ITEM_IDS_SCHEMA,
-            errors=errors
+            step_id="item_ids", data_schema=ITEM_IDS_SCHEMA, errors=errors
         )
 
     async def async_step_finished(
@@ -127,13 +221,18 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_failed(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Step after login has failed."""
-        reason = "unknown_login_error"
-        _exc = self._login_task.exception()
-        if isinstance(_exc, TgtgLoginError):
-            if _exc.args[0] == 403:
-                reason = "captcha"
-        return self.async_abort(reason=reason)
+        """Step after login has failed — lets the user retry without restarting setup."""
+        if user_input is not None:
+            self._login_task = None
+            self._polling_id = None
+            return await self.async_step_login()
+        _exc = self._login_task.exception() if self._login_task else None
+        error_key = "captcha" if (isinstance(_exc, TgtgLoginError) and _exc.args[0] == 403) else "unknown_login_error"
+        return self.async_show_form(
+            step_id="failed",
+            data_schema=vol.Schema({}),
+            errors={"base": error_key},
+        )
 
     async def async_step_reauth(
         self, entry_data: dict[str, Any] | None = None
@@ -146,18 +245,16 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 email=entry_data[CONF_EMAIL],
                 access_token=entry_data[CONF_ACCESS_TOKEN],
                 refresh_token=entry_data[CONF_REFRESH_TOKEN],
-                cookie=entry_data[CONF_COOKIE]
+                cookie=entry_data[CONF_COOKIE],
             )
             return await self.async_step_login()
         return self.async_show_form(
             step_id="reauth",
             data_schema=self.add_suggested_values_to_schema(LOGIN_SCHEMA, entry_data),
-            errors=errors
+            errors=errors,
         )
 
-    async def async_step_import(
-        self, import_data: dict[str, Any]
-    ) -> ConfigFlowResult:
+    async def async_step_import(self, import_data: dict[str, Any]) -> ConfigFlowResult:
         """Import configuration from YAML."""
         _LOGGER.info("Importing TGTG configuration from YAML")
 

@@ -13,12 +13,25 @@
                     "item_ids": "Artikel-IDs"
                 }
             },
+            "pin": {
+                "description": "Gib die PIN aus der Too Good To Go-E-Mail ein.",
+                "data": {
+                    "pin": "PIN"
+                }
+            },
             "finished": {
                 "description": "Anmeldung erfolgreich"
+            },
+            "failed": {
+                "description": "Anmeldung fehlgeschlagen. Klicke auf Senden, um es erneut zu versuchen."
             }
         },
+        "error": {
+            "captcha": "Too Good To Go verlangt zusätzliche Verifizierung. Du kannst es erneut versuchen.",
+            "unknown_login_error": "Authentifizierung fehlgeschlagen. Überprüfe die Protokolle für weitere Informationen."
+        },
         "progress": {
-            "login": "Klicke auf den Magic-Link in deinem Postfach am PC, um fortzufahren...\n(Das Öffnen der E-Mail auf dem Handy funktioniert nicht, wenn die Too Good To Go App installiert ist.)"
+            "login": "Eine Too Good To Go-Anmelde-E-Mail wird gesendet. Prüfe dein Postfach auf einen PIN-Code."
         },
         "abort": {
             "captcha": "Zusätzliche Verifizierung erforderlich. Versuche es später erneut.",
