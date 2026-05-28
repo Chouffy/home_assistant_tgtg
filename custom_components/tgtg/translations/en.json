@@ -21,9 +21,13 @@
             },
             "finished": {
                 "description": "Login successful"
+            },
+            "failed": {
+                "description": "Login failed. Click submit to try again."
             }
         },
         "error": {
+            "captcha": "Additional verification required by Too Good To Go. You can try again.",
             "unknown_login_error": "Authentication failed. Check the logs for more information."
         },
         "progress": {

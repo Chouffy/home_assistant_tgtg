@@ -221,13 +221,18 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     async def async_step_failed(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Step after login has failed."""
-        reason = "unknown_login_error"
-        _exc = self._login_task.exception()
-        if isinstance(_exc, TgtgLoginError):
-            if _exc.args[0] == 403:
-                reason = "captcha"
-        return self.async_abort(reason=reason)
+        """Step after login has failed — lets the user retry without restarting setup."""
+        if user_input is not None:
+            self._login_task = None
+            self._polling_id = None
+            return await self.async_step_login()
+        _exc = self._login_task.exception() if self._login_task else None
+        error_key = "captcha" if (isinstance(_exc, TgtgLoginError) and _exc.args[0] == 403) else "unknown_login_error"
+        return self.async_show_form(
+            step_id="failed",
+            data_schema=vol.Schema({}),
+            errors={"base": error_key},
+        )
 
     async def async_step_reauth(
         self, entry_data: dict[str, Any] | None = None

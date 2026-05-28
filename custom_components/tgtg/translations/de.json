@@ -21,9 +21,13 @@
             },
             "finished": {
                 "description": "Anmeldung erfolgreich"
+            },
+            "failed": {
+                "description": "Anmeldung fehlgeschlagen. Klicke auf Senden, um es erneut zu versuchen."
             }
         },
         "error": {
+            "captcha": "Too Good To Go verlangt zusätzliche Verifizierung. Du kannst es erneut versuchen.",
             "unknown_login_error": "Authentifizierung fehlgeschlagen. Überprüfe die Protokolle für weitere Informationen."
         },
         "progress": {
