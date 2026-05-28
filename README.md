@@ -1,16 +1,11 @@
 # Too Good To Go integration for Home Assistant
 
-> [!IMPORTANT]
-> This integration is currently not functional because of https://github.com/Chouffy/home_assistant_tgtg/issues/187 \
-> Unfortunately this is out of our control, keep an eye on the upstream library \
-> https://github.com/ahivert/tgtg-python
-
 This aims to show the stock of one or multiple [Too Good To Go](https://toogoodtogo.com/) items using the [tgtg-python](https://github.com/ahivert/tgtg-python) library.
 Sensor data can be used afterward to generate notifications, history graphs, ... share your best examples in the [Discussion tab](https://github.com/Chouffy/home_assistant_tgtg/discussions)!
 
 ## Features
 
-- **Easy setup** - No tokens, Docker containers, or Python scripts needed! Just enter your email and click the magic link.
+- **Easy setup** - No tokens, Docker containers, or Python scripts needed! Just enter your email and enter the PIN from the login email.
 - **Config Flow** - Full UI-based configuration
 - **Automatic favorites** - Retrieves all your favorites from the TGTG app (with pagination for accounts with 20+ favorites)
 - **Smart polling** - More frequent updates (every 3 minutes) during sales windows when items are likely to become available
@@ -39,7 +34,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 4. Go to **Settings** → **Devices & Services** → **Add Integration**
 5. Search for "TooGoodToGo" and follow the setup wizard
 6. Enter your TGTG email address
-7. Check your email and click the magic link **on a PC** (not on mobile if the TGTG app is installed)
+7. Check your email for a PIN code from Too Good To Go and enter it in the setup wizard
 8. Optionally add any non-favorite item IDs
 9. Done!
 
@@ -135,7 +130,7 @@ filter:
 
 ### "Additional verification required" during setup
 
-This happens when TGTG's API detects unusual activity. Wait a few hours and try again.
+This happens when TGTG's API detects unusual activity (DataDome captcha). Click submit on the error screen to retry — it usually succeeds on the next attempt.
 
 ### Integration stops updating
 
