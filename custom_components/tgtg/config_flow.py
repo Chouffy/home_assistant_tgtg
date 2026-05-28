@@ -1,9 +1,9 @@
 """Too Good To Go config flow."""
 
 import asyncio
+import builtins
 import logging
 from typing import Any
-from unittest.mock import patch
 
 import voluptuous as vol
 from homeassistant.helpers import selector
@@ -48,9 +48,13 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     _tgtg = None
 
     def _tgtg_login_without_stdin_prompt(self):
-        """Run login without trying to read stdin for a PIN code."""
-        with patch("builtins.input", return_value=""):
+        """Run login with empty PIN input to keep non-interactive polling flow."""
+        original_input = builtins.input
+        builtins.input = lambda *_args, **_kwargs: ""
+        try:
             self._tgtg.login()
+        finally:
+            builtins.input = original_input
 
     async def _tgtg_login(self):
         """Handled in the background to check the login status."""
