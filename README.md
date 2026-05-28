@@ -34,7 +34,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 4. Go to **Settings** → **Devices & Services** → **Add Integration**
 5. Search for "TooGoodToGo" and follow the setup wizard
 6. Enter your TGTG email address
-7. Check your email for a PIN code from Too Good To Go and enter it in the setup wizard
+7. Check your email for a PIN code from Too Good To Go (**open it in a new tab**) and enter it in the setup wizard
 8. Optionally add any non-favorite item IDs
 9. Done!
 
