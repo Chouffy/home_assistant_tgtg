@@ -1,9 +1,10 @@
 """Too Good To Go config flow."""
 
 import asyncio
-import builtins
+import datetime
 import logging
-import threading
+import time
+from http import HTTPStatus
 from typing import Any
 
 import voluptuous as vol
@@ -11,7 +12,15 @@ from homeassistant.helpers import selector
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_EMAIL, CONF_ACCESS_TOKEN
 
-from tgtg import TgtgClient, TgtgLoginError
+from tgtg import (
+    AUTH_POLLING_ENDPOINT,
+    MAX_POLLING_TRIES,
+    POLLING_WAIT_TIME,
+    TgtgAPIError,
+    TgtgClient,
+    TgtgLoginError,
+    TgtgPollingError,
+)
 
 from .const import DOMAIN, CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS
 
@@ -47,24 +56,40 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     _config = {}
     _login_task = None
     _tgtg = None
-    _stdin_patch_lock = threading.Lock()
 
-    def _tgtg_login_without_stdin_prompt(self):
-        """Suppress PIN stdin prompt to avoid EOF while keeping polling login flow."""
-        with self._stdin_patch_lock:
-            original_input = builtins.input
-            builtins.input = lambda *_args, **_kwargs: ""
-            try:
-                self._tgtg.login()
-            finally:
-                builtins.input = original_input
+    def _tgtg_start_polling_without_pin(self, polling_id: str):
+        """Use non-interactive polling auth because Home Assistant has no stdin."""
+        for _ in range(MAX_POLLING_TRIES):
+            response = self._tgtg._post(
+                self._tgtg._get_url(AUTH_POLLING_ENDPOINT),
+                json={
+                    "device_type": self._tgtg.device_type,
+                    "email": self._tgtg.email,
+                    "request_polling_id": polling_id,
+                },
+            )
+            if response.status_code == HTTPStatus.ACCEPTED:
+                time.sleep(POLLING_WAIT_TIME)
+                continue
+            if response.status_code == HTTPStatus.OK:
+                login_response = response.json()
+                self._tgtg.access_token = login_response["access_token"]
+                self._tgtg.refresh_token = login_response["refresh_token"]
+                self._tgtg.last_time_token_refreshed = datetime.datetime.now()
+                self._tgtg.cookie = response.headers["Set-Cookie"]
+                return
+            if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+                raise TgtgAPIError(response.status_code, "Too many requests. Try again later.")
+            raise TgtgLoginError(response.status_code, response.content)
+
+        raise TgtgPollingError(
+            f"Max retries ({MAX_POLLING_TRIES * POLLING_WAIT_TIME} seconds) reached. Try again."
+        )
 
     async def _tgtg_login(self):
         """Handled in the background to check the login status."""
         while True:
-            await self.hass.async_add_executor_job(
-                self._tgtg_login_without_stdin_prompt
-            )
+            await self.hass.async_add_executor_job(self._tgtg.login)
             if self._tgtg.access_token is not None:
                 break
             await asyncio.sleep(5)  # attempt to prevent captcha
@@ -77,6 +102,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             self._config = user_input
             self._tgtg = TgtgClient(email=user_input[CONF_EMAIL])
+            self._tgtg.start_polling = self._tgtg_start_polling_without_pin
             return await self.async_step_login()
         return self.async_show_form(
             step_id="user", data_schema=LOGIN_SCHEMA, errors=errors
@@ -152,6 +178,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 refresh_token=entry_data[CONF_REFRESH_TOKEN],
                 cookie=entry_data[CONF_COOKIE],
             )
+            self._tgtg.start_polling = self._tgtg_start_polling_without_pin
             return await self.async_step_login()
         return self.async_show_form(
             step_id="reauth",
