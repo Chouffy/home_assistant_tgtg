@@ -3,7 +3,9 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 from functools import partial
+import json
 import logging
+from urllib.parse import urlparse
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -156,7 +158,12 @@ class TGTGUpdateCoordinator(DataUpdateCoordinator):
             raise ConfigEntryAuthFailed() from err
         except TgtgAPIError as err:
             self._consecutive_api_errors += 1
-            if err.args[0] == 403 and "://captcha-delivery.com" in str(err.args[1]):
+            try:
+                _host = urlparse(json.loads(err.args[1]).get("url", "")).hostname or ""
+                _is_captcha = _host == "captcha-delivery.com" or _host.endswith(".captcha-delivery.com")
+            except (ValueError, AttributeError):
+                _is_captcha = False
+            if err.args[0] == 403 and _is_captcha:
                 if self._consecutive_api_errors > 4:
                     raise UpdateFailed(translation_key="too_many_requests") from err
                 _LOGGER.warning("Too many API requests, delaying updates for 1 hour.")
