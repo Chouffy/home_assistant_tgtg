@@ -100,7 +100,7 @@ card:
   title: TGTG Surprise Bags
 filter:
   template: |-
-    {% for state in states.sensor if 'sensor.tgtg_' in state.entity_id %}
+    {% for state in states.sensor if state.entity_id in integration_entities('tgtg') %}
       {% set entity_id = state.entity_id %}
       {% set state = states(entity_id) %}
       {%- if is_number(state) and state | int > 0 %}
