@@ -27,7 +27,7 @@
             "unknown_login_error": "Authentifizierung fehlgeschlagen. Überprüfe die Protokolle für weitere Informationen."
         },
         "progress": {
-            "login": "Eine Too Good To Go-Anmelde-E-Mail wird angefordert."
+            "login": "Eine Too Good To Go-Anmelde-E-Mail wird gesendet. Prüfe dein Postfach auf einen PIN-Code."
         },
         "abort": {
             "captcha": "Zusätzliche Verifizierung erforderlich. Versuche es später erneut.",

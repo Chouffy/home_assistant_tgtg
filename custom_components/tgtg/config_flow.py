@@ -2,7 +2,6 @@
 
 import datetime
 import logging
-import time
 from http import HTTPStatus
 from typing import Any
 
@@ -13,9 +12,7 @@ from homeassistant.const import CONF_EMAIL, CONF_ACCESS_TOKEN
 
 from tgtg import (
     AUTH_BY_EMAIL_ENDPOINT,
-    AUTH_POLLING_ENDPOINT,
-    MAX_POLLING_TRIES,
-    POLLING_WAIT_TIME,
+    AUTH_BY_REQUEST_PIN_ENDPOINT,
     TgtgAPIError,
     TgtgClient,
     TgtgLoginError,
@@ -25,7 +22,6 @@ from tgtg import (
 from .const import DOMAIN, CONF_COOKIE, CONF_REFRESH_TOKEN, CONF_ITEM_IDS
 
 _LOGGER = logging.getLogger(__name__)
-AUTH_BY_REQUEST_PIN_ENDPOINT = "auth/v5/authByRequestPin"
 
 LOGIN_SCHEMA = vol.Schema(
     {
@@ -62,10 +58,13 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
     MINOR_VERSION = 0
-    _config = {}
-    _login_task = None
-    _polling_id = None
-    _tgtg = None
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._config: dict[str, Any] = {}
+        self._login_task = None
+        self._polling_id: str | None = None
+        self._tgtg: TgtgClient | None = None
 
     def _tgtg_post(self, endpoint: str, **kwargs):
         """Post to the TGTG API using the client's configured session."""
@@ -85,31 +84,28 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
             self._tgtg.login()
             return None
 
-        for _ in range(2):
-            response = self._tgtg_post(
-                AUTH_BY_EMAIL_ENDPOINT,
-                json={
-                    "device_type": self._tgtg.device_type,
-                    "email": self._tgtg.email,
-                },
-            )
-            if response.status_code == HTTPStatus.OK:
-                first_login_response = response.json()
-                if first_login_response["state"] == "TERMS":
-                    raise TgtgPollingError(
-                        f"This email {self._tgtg.email} is not linked to a tgtg account. "
-                        "Please signup with this email first."
-                    )
-                if first_login_response["state"] == "WAIT":
-                    return first_login_response["polling_id"]
-                raise TgtgLoginError(response.status_code, response.content)
-            if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
-                raise TgtgAPIError(
-                    response.status_code, "Too many requests. Try again later."
+        response = self._tgtg_post(
+            AUTH_BY_EMAIL_ENDPOINT,
+            json={
+                "device_type": self._tgtg.device_type,
+                "email": self._tgtg.email,
+            },
+        )
+        if response.status_code == HTTPStatus.OK:
+            first_login_response = response.json()
+            if first_login_response["state"] == "TERMS":
+                raise TgtgPollingError(
+                    f"This email {self._tgtg.email} is not linked to a tgtg account. "
+                    "Please signup with this email first."
                 )
+            if first_login_response["state"] == "WAIT":
+                return first_login_response["polling_id"]
             raise TgtgLoginError(response.status_code, response.content)
-
-        return None
+        if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            raise TgtgAPIError(
+                response.status_code, "Too many requests. Try again later."
+            )
+        raise TgtgLoginError(response.status_code, response.content)
 
     def _tgtg_auth_by_request_pin(self, polling_id: str, pin: str) -> None:
         """Complete login using the PIN sent by TGTG."""
@@ -134,37 +130,6 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 response.status_code, "Too many requests. Try again later."
             )
         raise TgtgLoginError(response.status_code, response.content)
-
-    def _tgtg_start_polling_without_pin(self, polling_id: str):
-        """Use non-interactive polling auth because Home Assistant has no stdin."""
-        for _ in range(MAX_POLLING_TRIES):
-            response = self._tgtg_post(
-                AUTH_POLLING_ENDPOINT,
-                json={
-                    "device_type": self._tgtg.device_type,
-                    "email": self._tgtg.email,
-                    "request_polling_id": polling_id,
-                },
-            )
-            if response.status_code == HTTPStatus.ACCEPTED:
-                time.sleep(POLLING_WAIT_TIME)
-                continue
-            if response.status_code == HTTPStatus.OK:
-                login_response = response.json()
-                self._tgtg.access_token = login_response["access_token"]
-                self._tgtg.refresh_token = login_response["refresh_token"]
-                self._tgtg.last_time_token_refreshed = datetime.datetime.now()
-                self._tgtg.cookie = response.headers["Set-Cookie"]
-                return
-            if response.status_code == HTTPStatus.TOO_MANY_REQUESTS:
-                raise TgtgAPIError(
-                    response.status_code, "Too many requests. Try again later."
-                )
-            raise TgtgLoginError(response.status_code, response.content)
-
-        raise TgtgPollingError(
-            f"Max retries ({MAX_POLLING_TRIES * POLLING_WAIT_TIME} seconds) reached. Try again."
-        )
 
     async def _tgtg_login(self):
         """Handled in the background to check the login status."""
@@ -207,7 +172,6 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Collect the login PIN sent by TGTG."""
-        errors = {}
         if user_input is not None:
             try:
                 await self.hass.async_add_executor_job(
@@ -217,12 +181,12 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 )
             except (TgtgAPIError, TgtgLoginError) as err:
                 _LOGGER.error("Unexpected error during PIN login: %s", err)
-                errors["base"] = "unknown_login_error"
+                self._login_task = None
+                self._polling_id = None
+                return await self.async_step_login()
             else:
                 return await self.async_step_login_complete()
-        return self.async_show_form(
-            step_id="pin", data_schema=PIN_SCHEMA, errors=errors
-        )
+        return self.async_show_form(step_id="pin", data_schema=PIN_SCHEMA, errors={})
 
     async def async_step_login_complete(
         self, user_input: dict[str, Any] | None = None
