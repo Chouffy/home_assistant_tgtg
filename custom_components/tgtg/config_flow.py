@@ -3,6 +3,7 @@
 import asyncio
 import builtins
 import logging
+import threading
 from typing import Any
 
 import voluptuous as vol
@@ -46,15 +47,17 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     _config = {}
     _login_task = None
     _tgtg = None
+    _stdin_patch_lock = threading.Lock()
 
     def _tgtg_login_without_stdin_prompt(self):
-        """Run login with empty PIN input to keep non-interactive polling flow."""
-        original_input = builtins.input
-        builtins.input = lambda *_args, **_kwargs: ""
-        try:
-            self._tgtg.login()
-        finally:
-            builtins.input = original_input
+        """Suppress PIN stdin prompt to avoid EOF while keeping polling login flow."""
+        with self._stdin_patch_lock:
+            original_input = builtins.input
+            builtins.input = lambda *_args, **_kwargs: ""
+            try:
+                self._tgtg.login()
+            finally:
+                builtins.input = original_input
 
     async def _tgtg_login(self):
         """Handled in the background to check the login status."""
