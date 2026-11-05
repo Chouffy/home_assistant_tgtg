@@ -3,6 +3,7 @@
   "name": "TooGoodToGo",
   "codeowners": ["@chouffy", "@pantherale0", "@tjorim"],
   "config_flow": true,
+  "dependencies": ["persistent_notification"],
   "documentation": "https://github.com/Chouffy/home_assistant_tgtg",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Chouffy/home_assistant_tgtg/issues",

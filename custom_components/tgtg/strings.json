@@ -1,6 +1,10 @@
 {
     "config": {
         "step": {
+            "reauth_confirm": {
+                "title": "Renew your Too Good To Go session",
+                "description": "Continue to renew the saved session and request a new login PIN by email. No email is sent until you confirm. If Too Good To Go is requesting a CAPTCHA, wait before trying again."
+            },
             "user": {
                 "description": "Setup your Too Good To Go account",
                 "data": {
@@ -23,7 +27,7 @@
                 "description": "Login successful"
             },
             "failed": {
-                "description": "Login failed. Click submit to try again."
+                "description": "Login failed.\n\n{captcha_link}\n\nIf a CAPTCHA link is shown, open it on the same network as Home Assistant. The link can expire and completing it may not unlock the integration session. Click submit only when you are ready to try again."
             }
         },
         "error": {
@@ -38,6 +42,18 @@
             "already_configured": "This user is already configured.",
             "unknown_login_error": "Authentication failed. Check the logs for more information.",
             "import_missing_email": "YAML import failed - email is required. Please add email to your YAML config or set up the integration manually."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Polling intervals",
+                "description": "Intervals are in minutes. Each update adds a random +/- 30 seconds. Set the sales-window interval to 0 to disable faster polling. CAPTCHA and rate-limit pauses are not shortened.",
+                "data": {
+                    "scan_interval": "Normal interval (minutes)",
+                    "sales_scan_interval": "Sales-window interval (minutes, 0 to disable)"
+                }
+            }
         }
     },
     "exceptions": {
