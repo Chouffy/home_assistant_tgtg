@@ -2,6 +2,7 @@
   "domain": "tgtg",
   "name": "TooGoodToGo",
   "codeowners": ["@chouffy", "@pantherale0", "@tjorim"],
+  "categories": ["productivity_information.shopping_groceries"],
   "config_flow": true,
   "dependencies": ["persistent_notification"],
   "documentation": "https://github.com/Chouffy/home_assistant_tgtg",
