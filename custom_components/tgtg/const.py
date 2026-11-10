@@ -4,8 +4,15 @@ DOMAIN = "tgtg"
 CONF_REFRESH_TOKEN = "refresh_token"
 CONF_COOKIE = "cookie"
 CONF_ITEM_IDS = "item_ids"
+CONF_SCAN_INTERVAL = "scan_interval"
+CONF_SALES_SCAN_INTERVAL = "sales_scan_interval"
 
 DEFAULT_SCAN_INTERVAL = 60  # 60 minutes default, 3 minutes during sales windows
+DEFAULT_SALES_SCAN_INTERVAL = 3
+POLLING_JITTER_SECONDS = 30
+TGTG_USER_AGENT = (
+    "TGTG/26.7.2 Dalvik/2.1.0 (Linux; U; Android 17; Pixel 8 Pro Build/CP2A.260705.006)"
+)
 
 ATTR_ITEM_ID = "item_id"
 ATTR_ITEM_URL = "item_url"

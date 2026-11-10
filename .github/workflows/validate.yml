@@ -12,6 +12,22 @@ on:
       - "main"
 
 jobs:
+  tests:
+    name: "Unit tests and formatting"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v6.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - run: python -m pip install -r requirements-test.txt
+      - run: python -m pytest -q tests
+      - run: >-
+          python -m black --check tests
+          custom_components/tgtg/__init__.py custom_components/tgtg/const.py
+          custom_components/tgtg/captcha.py custom_components/tgtg/coordinator.py
+          custom_components/tgtg/config_flow.py
+
   hassfest: # https://developers.home-assistant.io/blog/2020/04/16/hassfest
     name: "Hassfest Validation"
     runs-on: "ubuntu-latest"

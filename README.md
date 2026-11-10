@@ -34,7 +34,7 @@ Sensor data can be used afterward to generate notifications, history graphs, ...
 4. Go to **Settings** → **Devices & Services** → **Add Integration**
 5. Search for "TooGoodToGo" and follow the setup wizard
 6. Enter your TGTG email address and submit
-   > If you see "Additional verification required", just click submit to try again
+  > If additional verification is required, use the CAPTCHA link when provided and wait before retrying. Repeated attempts can prolong a block.
 7. Check your email for a PIN code from Too Good To Go (**open it in a new tab**) and enter it in the setup wizard
 8. Optionally add any non-favorite item IDs
 9. Done!
@@ -54,10 +54,21 @@ During setup, you can optionally add item IDs for stores that aren't in your fav
 
 ## How polling works
 
-- **Default polling**: Every 60 minutes
-- **Sales window polling**: Every 3 minutes when any item is within its sales window
+- **Default polling**: Every 60 minutes, configurable in the integration options (1-1440 minutes)
+- **Sales window polling**: Every 3 minutes during the first 10 minutes of a sales window, configurable in the integration options (0-1440 minutes; 0 disables faster polling)
+- **Jitter**: Each next polling interval includes an independent random variation of up to 30 seconds in either direction
 - **Rate limited**: 1 second delay between API calls to prevent being blocked
-- **Adaptive**: If API rate limits are hit, polling is automatically reduced to once per hour
+- **Adaptive**: HTTP 403/429 pauses requests for one hour, including after a Home Assistant restart. Jitter does not shorten this pause.
+
+Open the integration's options to change intervals without renewing authentication.
+For example, set the normal interval to 120 and the sales-window interval to 0
+to poll roughly every two hours without a faster sales-window mode. Saving options
+reloads only this integration. One update may make multiple API calls for favorites,
+additional items and orders; a longer interval does not guarantee avoiding a CAPTCHA.
+
+Additional item IDs returning HTTP 410 are remembered and skipped on subsequent
+requests without removing them from your configuration. An item reappearing in
+favorites is automatically restored to individual polling.
 
 > **Note**: Each time you add/remove a favorite in the TGTG app, **reload the integration** for changes to take effect.
 
@@ -131,11 +142,25 @@ filter:
 
 ### "Additional verification required" during setup
 
-This happens when TGTG's API detects unusual activity (DataDome captcha). Click submit on the error screen to retry — it usually succeeds on the next attempt.
+Too Good To Go may require a DataDome CAPTCHA. When the API supplies a valid
+HTTPS challenge URL on `captcha-delivery.com`, the integration shows the complete
+link in a persistent notification and the setup error form. Open it manually on
+the same network as Home Assistant. Links may expire, and verification in a browser
+may not unlock the integration's session because of IP or cookie binding. Do not
+share challenge URLs. The integration does not solve or bypass CAPTCHAs.
+
+Related to [issue #204](https://github.com/Chouffy/home_assistant_tgtg/issues/204),
+the client uses an explicit updated Android User-Agent instead of the library's
+old defaults. It is passed through the supported `TgtgClient` constructor argument,
+not patched in `site-packages`. This workaround is not guaranteed to prevent blocks.
 
 ### Integration stops updating
 
-Your tokens may have expired. Go to **Settings** → **Devices & Services**, find the TGTG integration, and use the "Reconfigure" option to reauthenticate.
+HTTP 401 requests reauthentication. Use **Reconfigure** on the existing integration
+to renew the session manually; a new PIN email is requested only after confirmation.
+Your configured items and entity IDs are retained, and renewed tokens are persisted.
+Do not delete the integration to renew credentials. A setup-retry message after a
+403/429 includes the pause deadline; it does not mean a new login is being attempted.
 
 ### Not all favorites showing
 

@@ -56,6 +56,19 @@ Home Assistant instance running and already configured with the included
 [`configuration.yaml`](./configuration.yaml)
 file.
 
+## Unit tests
+
+Run the dependency-light regression suite with Python 3.14:
+
+```sh
+python -m pip install -r requirements-test.txt
+python -m pytest -q tests
+```
+
+The tests import the actual integration modules with Home Assistant and the TGTG
+client mocked at their boundaries. They do not contact TGTG, send login emails,
+solve CAPTCHAs, or substitute for an end-to-end Home Assistant setup test.
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under its MIT License.
